@@ -1,0 +1,3161 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vyrl — Viral Reels in Sekunden</title>
+<style>
+  :root {
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --purple-dark: #5B21B6;
+    --green: #10B981;
+    --green-light: #D1FAE5;
+    --red: #EF4444;
+    --amber: #F59E0B;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-400: #9CA3AF;
+    --gray-600: #4B5563;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #FAFAFA;
+    color: var(--gray-900);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 24px;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo { display: flex; align-items: baseline; gap: 1px; }
+  .nav-logo .v { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -1px; }
+  .nav-logo .yrl { font-size: 22px; font-weight: 800; color: var(--gray-900); letter-spacing: -1px; }
+  .nav-badge {
+    font-size: 10px; font-weight: 600; letter-spacing: .05em;
+    background: var(--purple-light); color: var(--purple);
+    padding: 2px 8px; border-radius: 20px; margin-left: 10px;
+    text-transform: uppercase;
+  }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-link { font-size: 13px; color: var(--gray-600); cursor: pointer; text-decoration: none; }
+  .nav-link:hover { color: var(--gray-900); }
+  .lang-switch {
+    display: flex; padding: 3px; background: var(--gray-100);
+    border: 1px solid var(--gray-200); border-radius: 20px;
+  }
+  .lang-btn {
+    border: 0; background: transparent; color: var(--gray-600);
+    padding: 5px 9px; border-radius: 16px; font-size: 11px;
+    font-weight: 700; cursor: pointer;
+  }
+  .lang-btn.active { background: #fff; color: var(--purple); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 64px 24px 48px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .hero-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--purple-light); color: var(--purple);
+    font-size: 12px; font-weight: 600;
+    padding: 6px 14px; border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero-pill > span:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; flex: 0 0 auto; }
+  .hero h1 {
+    font-size: 38px; font-weight: 800; line-height: 1.15;
+    letter-spacing: -1.5px; color: var(--gray-900);
+    margin-bottom: 14px;
+  }
+  .hero h1 em { font-style: normal; color: var(--purple); }
+  .hero p { font-size: 16px; color: var(--gray-600); line-height: 1.6; margin-bottom: 32px; }
+
+  /* STEPS INDICATOR */
+  .steps-bar {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; margin: 0 auto 40px;
+    max-width: 480px; padding: 0 24px;
+  }
+  .step-dot {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    flex: 1;
+  }
+  .step-dot .circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    background: var(--gray-100); color: var(--gray-400);
+    border: 2px solid var(--gray-200);
+    transition: all .3s ease;
+  }
+  .step-dot.active .circle { background: var(--purple); color: #fff; border-color: var(--purple); }
+  .step-dot.done .circle { background: var(--green); color: #fff; border-color: var(--green); font-size: 0; }
+  .step-dot.done .circle::after { content: '✓'; font-size: 13px; }
+  .step-dot .label { font-size: 11px; font-weight: 500; color: var(--gray-400); white-space: nowrap; }
+  .step-dot.active .label { color: var(--purple); }
+  .step-dot.done .label { color: var(--green); }
+  .step-line { flex: 1; height: 2px; background: var(--gray-200); margin-bottom: 18px; transition: background .3s; max-width: 40px; }
+  .step-line.done { background: var(--green); }
+
+  /* MAIN CARD */
+  .main { max-width: 560px; margin: 0 auto; padding: 0 16px 80px; }
+
+  .card {
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    padding: 28px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--purple-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 14px;
+  }
+  .card h2 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .card .sub { font-size: 13px; color: var(--gray-600); margin-bottom: 20px; }
+
+  /* TREND GRID */
+  .trend-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .trend-card {
+    min-height: 150px; padding: 16px; border-radius: 18px;
+    border: 1.5px solid rgba(124,58,237,.12);
+    cursor: pointer; transition: all .15s; background: #fff;
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; align-items: flex-start;
+  }
+  .trend-card:focus-visible { outline: 3px solid #BFA8FF; outline-offset: 3px; }
+  .trend-card::after {
+    content: ''; position: absolute; width: 92px; height: 92px; border-radius: 50%;
+    right: -42px; bottom: -46px; background: var(--topic-glow, rgba(124,58,237,.12));
+    transition: transform .2s ease;
+  }
+  .trend-card:hover::after, .trend-card.sel::after { transform: scale(1.35); }
+  .trend-card:hover { border-color: var(--purple); background: var(--purple-light); }
+  .trend-card.sel { border-color: var(--purple); background: var(--purple-light); }
+  .trend-card.sel .tc-name { color: var(--purple-dark); }
+  .trend-card.sel::before {
+    content: '✓'; position: absolute; z-index: 2; top: 11px; right: 11px;
+    width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--purple); color: #fff; font-size: 12px; font-weight: 900;
+    box-shadow: 0 5px 14px rgba(124,58,237,.28);
+  }
+  .topic-emoji {
+    width: 43px; height: 43px; display: grid; place-items: center;
+    border-radius: 14px; margin-bottom: 18px; font-size: 23px;
+    background: var(--topic-bg, #F3F0FF); box-shadow: 3px 3px 0 var(--topic-shadow, #D8CCFF);
+    transform: rotate(-3deg);
+  }
+  .tc-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: .04em;
+    padding: 3px 7px; border-radius: 20px; display: inline-block; margin-bottom: 7px;
+  }
+  .hot { background: #FEE2E2; color: #DC2626; }
+  .rising { background: #FEF3C7; color: #D97706; }
+  .evergreen { background: #D1FAE5; color: #059669; }
+  .tc-name { font-size: 14px; font-weight: 800; color: var(--gray-900); margin-bottom: 4px; line-height: 1.25; }
+  .tc-views { font-size: 11px; color: var(--gray-600); line-height: 1.35; }
+  .topic-custom-box {
+    border: 2px dashed #CFC2F5; padding: 16px; border-radius: 18px;
+    background: linear-gradient(120deg, rgba(255,255,255,.92), rgba(248,244,255,.95));
+  }
+  .custom-head { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
+  .custom-icon {
+    width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center;
+    background: #171221; color: #fff; box-shadow: 3px 3px 0 #C9FF52;
+  }
+  .custom-copy strong { display: block; font-size: 13px; }
+  .custom-copy span { display: block; font-size: 10.5px; color: var(--gray-600); margin-top: 2px; }
+  .idea-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .idea-chip {
+    border: 0; border-radius: 20px; padding: 6px 9px; cursor: pointer;
+    background: #F2EEFC; color: #6445A1; font-size: 10px; font-weight: 700;
+  }
+  .idea-chip:hover { background: #E8DEFF; transform: translateY(-1px); }
+  .dna-card {
+    background:
+      radial-gradient(circle at 100% 0, rgba(255,63,164,.12), transparent 11rem),
+      rgba(255,255,255,.9);
+  }
+  .dna-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .dna-wide { grid-column: 1 / -1; }
+  .dna-item label {
+    display: block; font-size: 10px; font-weight: 800; color: var(--gray-600);
+    text-transform: uppercase; letter-spacing: .055em; margin-bottom: 6px;
+  }
+  .dna-item input, .dna-item select, .dna-item textarea {
+    width: 100%; border: 1.5px solid var(--gray-200); border-radius: 12px;
+    padding: 10px 11px; font: inherit; font-size: 12px; outline: none;
+    background: rgba(255,255,255,.9); color: var(--gray-900);
+  }
+  .dna-item textarea { min-height: 72px; resize: vertical; line-height: 1.45; }
+  .dna-item input:focus, .dna-item select:focus, .dna-item textarea:focus { border-color: var(--purple); }
+  .quality-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; }
+  .quality-option {
+    border: 1.5px solid var(--gray-200); border-radius: 12px; padding: 9px 7px;
+    background: #fff; text-align: center; cursor: pointer; font: inherit;
+  }
+  .quality-option strong { display: block; font-size: 10.5px; }
+  .quality-option small { display: block; color: var(--gray-500); font-size: 8.5px; margin-top: 2px; }
+  .quality-option.active { border-color: var(--purple); background: var(--purple-light); color: var(--purple-dark); }
+  .research-toggle {
+    display: flex; align-items: flex-start; gap: 9px; padding: 10px;
+    border-radius: 12px; background: #F7F5FD; font-size: 10.5px; line-height: 1.45;
+  }
+  .research-toggle input { accent-color: var(--purple); margin-top: 2px; }
+  .smart-brief {
+    margin-top: 16px; border: 1.5px solid rgba(124,58,237,.18);
+    border-radius: 19px; overflow: hidden; background: linear-gradient(135deg,#F8F5FF,#FFF);
+  }
+  .smart-brief summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 15px; cursor: pointer; list-style: none;
+  }
+  .smart-brief summary::-webkit-details-marker { display: none; }
+  .brief-summary-title { display: flex; align-items: center; gap: 10px; }
+  .brief-summary-title > span:first-child {
+    width: 35px; height: 35px; border-radius: 12px; display: grid; place-items: center;
+    background: #171221; box-shadow: 3px 3px 0 #C9FF52;
+  }
+  .brief-summary-title strong { display: block; font-size: 12.5px; }
+  .brief-summary-title small { display: block; font-size: 9.5px; color: var(--gray-500); margin-top: 2px; }
+  .brief-arrow { color: var(--purple); font-size: 16px; transition: transform .2s; }
+  .smart-brief[open] .brief-arrow { transform: rotate(180deg); }
+  .brief-body { padding: 0 15px 15px; }
+  .brief-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .brief-field label {
+    display: block; font-size: 9px; font-weight: 800; color: var(--gray-600);
+    text-transform: uppercase; letter-spacing: .055em; margin-bottom: 5px;
+  }
+  .brief-field input, .brief-field textarea {
+    width: 100%; border: 1.5px solid var(--gray-200); border-radius: 11px;
+    padding: 9px 10px; font: inherit; font-size: 11px; outline: none; background: #fff;
+  }
+  .brief-field textarea { resize: vertical; min-height: 68px; line-height: 1.45; }
+  .brief-wide { grid-column: 1 / -1; }
+  .brief-field input:focus, .brief-field textarea:focus { border-color: var(--purple); }
+  .link-hint { font-size: 9px; color: var(--gray-500); line-height: 1.45; margin-top: 5px; }
+  .btn-analyze {
+    width: 100%; margin-top: 10px; border: 0; border-radius: 12px; padding: 11px;
+    color: #fff; font: inherit; font-size: 11.5px; font-weight: 800; cursor: pointer;
+    background: linear-gradient(100deg,#171221,#7047EB);
+  }
+  .btn-analyze:disabled { opacity: .55; cursor: wait; }
+  .brief-result {
+    display: none; margin-top: 10px; padding: 11px; border-radius: 12px;
+    background: #ECFDF5; color: #065F46; font-size: 10px; line-height: 1.55;
+  }
+  .brief-result.open { display: block; }
+  .pillar-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+  .pillar-chip { padding: 4px 7px; border-radius: 20px; background: #D1FAE5; font-size: 9px; font-weight: 800; }
+  .video-engine-box {
+    border: 1px solid rgba(124,58,237,.18); border-radius: 15px;
+    padding: 13px; background: linear-gradient(120deg,#F5F0FF,#FFF);
+  }
+  .video-engine-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .video-engine-head strong { font-size: 12px; }
+  .video-engine-head span { font-size: 9px; font-weight: 900; color: #047857; background: #D1FAE5; padding: 4px 7px; border-radius: 20px; }
+  .video-engine-box p { font-size: 10px; color: var(--gray-600); line-height: 1.5; margin-top: 6px; }
+
+  /* CUSTOM TOPIC */
+  .divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; }
+  .divider span { font-size: 12px; color: var(--gray-400); white-space: nowrap; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--gray-200); }
+
+  /* HOOK PILLS */
+  .hook-grid {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .hook-pill {
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-200);
+    cursor: pointer; transition: all .15s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hook-pill:hover { border-color: var(--purple); }
+  .hook-pill.sel { border-color: var(--purple); background: var(--purple-light); }
+  .hook-pill .emoji { font-size: 18px; width: 28px; text-align: center; flex-shrink: 0; }
+  .hook-pill .hook-text { flex: 1; }
+  .hook-pill .hook-name { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+  .hook-pill.sel .hook-name { color: var(--purple-dark); }
+  .hook-pill .hook-ex { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+
+  /* SETTINGS ROW */
+  .settings-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+  }
+  .setting-item label {
+    display: block; font-size: 11px; font-weight: 600;
+    color: var(--gray-600); text-transform: uppercase; letter-spacing: .05em;
+    margin-bottom: 6px;
+  }
+  .setting-item select, .setting-item input {
+    width: 100%; padding: 9px 12px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-200); font-size: 13px;
+    background: #fff; color: var(--gray-900);
+    appearance: none; outline: none;
+    cursor: pointer;
+  }
+  .setting-item select:focus, .setting-item input:focus { border-color: var(--purple); }
+
+  /* DAILY AUTOPILOT */
+  .autopilot-card {
+    border: 1.5px solid #C4B5FD;
+    background: linear-gradient(145deg, #fff, #F5F3FF);
+    position: relative; overflow: hidden;
+  }
+  .autopilot-card::after {
+    content: ''; position: absolute; width: 150px; height: 150px;
+    border-radius: 50%; right: -80px; top: -90px;
+    background: rgba(124,58,237,.08); pointer-events: none;
+  }
+  .autopilot-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+  .autopilot-title { display: flex; align-items: center; gap: 9px; font-size: 16px; font-weight: 800; }
+  .status-pill { font-size: 10px; font-weight: 800; padding: 5px 9px; border-radius: 20px; background: var(--gray-100); color: var(--gray-600); white-space: nowrap; }
+  .status-pill.on { background: var(--green-light); color: #047857; }
+  .schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .schedule-summary {
+    margin-top: 12px; border-radius: var(--radius-sm); padding: 11px 12px;
+    background: #fff; border: 1px solid var(--gray-200);
+    font-size: 12px; color: var(--gray-600); line-height: 1.55;
+  }
+  .schedule-summary strong { color: var(--gray-900); }
+  .schedule-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .btn-small {
+    flex: 1; border: 0; border-radius: var(--radius-sm); padding: 11px 12px;
+    font: inherit; font-size: 12px; font-weight: 750; cursor: pointer;
+  }
+  .btn-schedule { background: var(--purple); color: #fff; }
+  .btn-stop { background: #fff; color: var(--red); border: 1px solid #FECACA; }
+  .automation-note { margin-top: 10px; font-size: 10.5px; color: var(--gray-600); line-height: 1.5; }
+  .toggle-row { display: flex; align-items: flex-start; gap: 9px; margin-top: 12px; font-size: 12px; color: var(--gray-700); line-height: 1.45; cursor: pointer; }
+  .toggle-row input { accent-color: var(--purple); margin-top: 2px; }
+  .connection-intro {
+    padding: 13px; border-radius: 14px; margin-bottom: 13px;
+    background: linear-gradient(120deg, #F4F0FF, #FFF5FA);
+    color: var(--gray-700); font-size: 11.5px; line-height: 1.55;
+  }
+  .connection-intro strong { color: var(--gray-900); }
+  .provider-label {
+    display: block; margin: 13px 0 8px; font-size: 10px; font-weight: 800;
+    color: var(--gray-600); text-transform: uppercase; letter-spacing: .08em;
+  }
+  .provider-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 13px; }
+  .provider-btn {
+    display: flex; align-items: center; gap: 10px; padding: 11px;
+    border: 1.5px solid var(--gray-200); border-radius: 14px; background: #fff;
+    color: var(--gray-700); cursor: pointer; text-align: left; font-family: inherit;
+  }
+  .provider-btn:hover { border-color: #B8A2F2; transform: translateY(-1px); }
+  .provider-btn.active {
+    border-color: var(--purple); background: linear-gradient(120deg,#F0E9FF,#FFF4FA);
+    box-shadow: 0 8px 20px rgba(124,58,237,.10);
+  }
+  .provider-logo {
+    width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center;
+    font-size: 18px; background: #F3F0FA; flex: 0 0 auto;
+  }
+  .provider-btn strong { display: block; font-size: 12px; color: var(--gray-900); }
+  .provider-btn small { display: block; font-size: 9.5px; color: var(--gray-500); margin-top: 2px; }
+  .provider-field.hidden-provider { display: none; }
+  .channel-credential.hidden-channel { display: none; }
+  .model-picks { display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; margin-top: 8px; }
+  .model-pick {
+    border: 1px solid var(--gray-200); border-radius: 10px; padding: 8px;
+    background: #fff; font-size: 10px; font-weight: 700; color: var(--gray-700);
+    cursor: pointer;
+  }
+  .model-pick.active { border-color: var(--purple); background: var(--purple-light); color: var(--purple-dark); }
+  .channel-box { margin-top: 14px; }
+  .channel-primary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .channel-more { display: none; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 8px; }
+  .channel-more.open { display: grid; }
+  .channel-btn {
+    position: relative; display: flex; align-items: center; gap: 9px;
+    min-height: 52px; padding: 10px; border: 1.5px solid var(--gray-200);
+    border-radius: 14px; background: #fff; cursor: pointer; font-family: inherit;
+  }
+  .channel-btn:hover { border-color: #BCA6F2; transform: translateY(-1px); }
+  .channel-btn.selected { border-color: var(--purple); background: #F4EFFF; }
+  .channel-btn.selected::after {
+    content: '✓'; position: absolute; right: 7px; top: 7px; width: 17px; height: 17px;
+    border-radius: 50%; display: grid; place-items: center; background: var(--purple);
+    color: #fff; font-size: 9px; font-weight: 900;
+  }
+  .channel-icon { font-size: 20px; }
+  .channel-btn strong { font-size: 11px; color: var(--gray-900); }
+  .channel-btn small { display: block; margin-top: 2px; font-size: 8.5px; color: var(--gray-500); }
+  .more-channels {
+    width: 100%; margin-top: 8px; padding: 8px; border: 0; background: transparent;
+    color: var(--purple); font-size: 10.5px; font-weight: 800; cursor: pointer;
+  }
+  .channel-summary {
+    margin-top: 8px; padding: 9px 11px; border-radius: 11px; background: var(--gray-50);
+    font-size: 10px; line-height: 1.5; color: var(--gray-600);
+  }
+  .channel-help {
+    display: none; margin-top: 8px; padding: 11px; border-radius: 12px;
+    background: #171221; color: rgba(255,255,255,.78); font-size: 10px; line-height: 1.55;
+  }
+  .channel-help.open { display: block; }
+  .channel-help a { color: #D7FF75; font-weight: 800; }
+  .platform-connections { grid-column: 1 / -1; margin-top: 8px; }
+  .platform-connect-card {
+    display: none; padding: 15px; margin-top: 9px; border-radius: 16px;
+    border: 1px solid rgba(124,58,237,.14); background: #FBFAFF;
+  }
+  .platform-connect-card.active { display: block; }
+  .connect-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 11px; }
+  .connect-title { display: flex; align-items: center; gap: 9px; }
+  .connect-title span:first-child { font-size: 21px; }
+  .connect-title strong { display: block; font-size: 12px; }
+  .connect-title small { display: block; font-size: 9.5px; color: var(--gray-500); margin-top: 2px; }
+  .connect-state {
+    padding: 4px 8px; border-radius: 20px; background: #FFF3CD;
+    color: #876600; font-size: 8.5px; font-weight: 900; white-space: nowrap;
+  }
+  .connect-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .connect-field label {
+    display: block; font-size: 9px; color: var(--gray-600); font-weight: 800;
+    text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px;
+  }
+  .connect-field input, .connect-field select {
+    width: 100%; padding: 9px 10px; border: 1.5px solid var(--gray-200);
+    border-radius: 10px; font-size: 11px; outline: none;
+  }
+  .connect-field input:focus, .connect-field select:focus { border-color: var(--purple); }
+  .connect-wide { grid-column: 1 / -1; }
+  .connect-note { margin-top: 9px; font-size: 9.5px; color: var(--gray-600); line-height: 1.5; }
+  .connect-note a { color: var(--purple); font-weight: 800; }
+  .advanced-connect { margin-top: 9px; border-top: 1px solid var(--gray-200); padding-top: 8px; }
+  .advanced-connect summary { cursor: pointer; color: var(--gray-600); font-size: 10px; font-weight: 800; }
+  .advanced-connect .connect-fields { margin-top: 9px; }
+  .connection-empty {
+    grid-column: 1 / -1; padding: 12px; border-radius: 13px;
+    color: var(--gray-600); background: var(--gray-50); font-size: 10.5px; line-height: 1.5;
+  }
+  .oauth-hub {
+    grid-column: 1 / -1; margin-bottom: 13px; padding: 14px;
+    border-radius: 17px; background: linear-gradient(135deg,#171221,#32224E);
+    color: #fff;
+  }
+  .oauth-hub-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 11px; }
+  .oauth-hub-head strong { display: block; font-size: 13px; }
+  .oauth-hub-head small { display: block; color: rgba(255,255,255,.6); font-size: 9.5px; margin-top: 3px; line-height: 1.4; }
+  .easy-badge { padding: 4px 7px; border-radius: 20px; background: #C9FF52; color: #243400; font-size: 8px; font-weight: 900; white-space: nowrap; }
+  .oauth-list { display: grid; gap: 7px; }
+  .oauth-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 9px 10px; border-radius: 12px; background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.09);
+  }
+  .oauth-brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
+  .oauth-brand > span:first-child {
+    width: 31px; height: 31px; display: grid; place-items: center;
+    border-radius: 10px; background: rgba(255,255,255,.12); flex: 0 0 auto;
+  }
+  .oauth-brand strong { display: block; font-size: 10.5px; }
+  .oauth-brand small { display: block; font-size: 8.5px; color: rgba(255,255,255,.55); margin-top: 2px; }
+  .oauth-action {
+    border: 0; border-radius: 9px; padding: 7px 10px; background: #fff;
+    color: #241B31; font: inherit; font-size: 9px; font-weight: 900; cursor: pointer;
+    white-space: nowrap;
+  }
+  .oauth-action:hover { background: #DFFF94; }
+  .oauth-action.connected { background: #D1FAE5; color: #047857; }
+  .oauth-note { margin-top: 9px; font-size: 8.8px; color: rgba(255,255,255,.55); line-height: 1.45; }
+  .manual-master {
+    grid-column: 1 / -1; margin-top: 5px; padding-top: 10px;
+    border-top: 1px solid var(--gray-200);
+  }
+  .manual-master > summary {
+    cursor: pointer; font-size: 10px; color: var(--gray-600); font-weight: 800;
+  }
+  .manual-fields { display: contents; }
+  body.easy-connect .channel-credential,
+  body.easy-connect .platform-connections { display: none !important; }
+  body.manual-connect .channel-credential.hidden-channel { display: none !important; }
+  .easy-choice {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 14px 0;
+  }
+  .easy-choice-btn {
+    border: 1.5px solid var(--gray-200); border-radius: 14px; padding: 11px 8px;
+    background: #fff; cursor: pointer; text-align: center; font: inherit;
+  }
+  .easy-choice-btn span { display: block; font-size: 20px; margin-bottom: 5px; }
+  .easy-choice-btn strong { display: block; font-size: 10.5px; }
+  .easy-choice-btn small { display: block; font-size: 8.5px; color: var(--gray-500); margin-top: 3px; }
+  .easy-choice-btn.active { border-color: var(--purple); background: var(--purple-light); color: var(--purple-dark); }
+  .advanced-content { margin-top: 12px; }
+  .advanced-content > summary {
+    cursor: pointer; padding: 10px 12px; border-radius: 12px;
+    background: var(--gray-50); color: var(--gray-600); font-size: 10.5px; font-weight: 800;
+    list-style: none;
+  }
+  .advanced-content > summary::-webkit-details-marker { display: none; }
+  .advanced-content[open] > summary { color: var(--purple); background: var(--purple-light); }
+  .advanced-inner { margin-top: 10px; }
+  .simple-progress {
+    max-width: 620px; margin: -18px auto 34px; padding: 0 16px;
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 7px;
+  }
+  .simple-stage {
+    display: flex; align-items: center; gap: 7px; padding: 9px 10px;
+    border-radius: 12px; background: rgba(255,255,255,.66); color: var(--gray-500);
+    border: 1px solid rgba(124,58,237,.09); font-size: 9.5px; font-weight: 800;
+  }
+  .simple-stage span { width: 20px; height: 20px; display: grid; place-items: center; border-radius: 7px; background: var(--gray-100); }
+  .simple-stage.active { background: #F1EAFF; color: var(--purple-dark); border-color: #CFBEFF; }
+  .simple-stage.active span { background: var(--purple); color: #fff; }
+  .smart-summary {
+    margin: 10px 0 0; padding: 10px; border-radius: 12px;
+    background: #F7F5FD; color: var(--gray-600); font-size: 10px; line-height: 1.5;
+  }
+  .smart-summary strong { color: var(--gray-900); }
+  .optional-tag {
+    margin-left: 6px; padding: 2px 6px; border-radius: 20px;
+    background: var(--gray-100); color: var(--gray-500); font-size: 8px; font-weight: 800;
+  }
+  .mode-panel { display: none; }
+  .mode-panel.active { display: block; }
+  .steps-bar { display: none; }
+  .publish-check {
+    margin: 12px 0; padding: 13px; border-radius: 14px;
+    background: #F8F6FD; border: 1px solid var(--gray-200);
+  }
+  .publish-check-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .publish-check-title strong { font-size: 11px; }
+  .publish-state { padding: 4px 7px; border-radius: 20px; font-size: 8.5px; font-weight: 900; background: #FEF3C7; color: #92400E; }
+  .publish-state.ok { background: #D1FAE5; color: #047857; }
+  .publish-credentials { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .publish-credentials label { display: block; font-size: 9px; font-weight: 800; color: var(--gray-600); margin-bottom: 4px; }
+  .publish-credentials input { width: 100%; border: 1.5px solid var(--gray-200); border-radius: 10px; padding: 9px; font-size: 11px; outline: none; }
+  .publish-credentials input:focus { border-color: var(--purple); }
+  .publish-error { display: none; margin-top: 9px; border-radius: 10px; padding: 9px; background: #FEF2F2; color: #991B1B; font-size: 10px; line-height: 1.45; }
+  .publish-error.open { display: block; }
+  .video-url-warning { display: none; margin-top: 7px; color: #92400E; background: #FFFBEB; padding: 8px; border-radius: 9px; font-size: 9.5px; line-height: 1.45; }
+  .video-url-warning.open { display: block; }
+  .key-item { position: relative; }
+  .key-label-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+  .key-label-row label { margin: 0; }
+  .help-toggle {
+    width: 22px; height: 22px; border-radius: 50%; border: 1px solid #D8CCF8;
+    color: var(--purple); background: #F7F4FF; font-weight: 900; cursor: pointer;
+    display: grid; place-items: center; font-size: 11px;
+  }
+  .key-help {
+    display: none; grid-column: 1 / -1; padding: 14px;
+    border-radius: 14px; background: #171221; color: rgba(255,255,255,.78);
+    font-size: 11px; line-height: 1.65; margin-top: -2px;
+    box-shadow: 0 15px 35px rgba(23,18,33,.18);
+  }
+  .key-help.open { display: block; animation: helpIn .18s ease-out; }
+  @keyframes helpIn { from { opacity: 0; transform: translateY(-4px); } }
+  .key-help strong { display: block; color: #fff; font-size: 12px; margin-bottom: 6px; }
+  .key-help ol { margin: 6px 0 10px 18px; }
+  .key-help li { padding-left: 2px; margin-bottom: 3px; }
+  .key-help a {
+    display: inline-flex; align-items: center; gap: 5px;
+    color: #D7FF75; font-weight: 800; text-decoration: none;
+  }
+  .key-help a:hover { text-decoration: underline; }
+  .safety-strip {
+    display: flex; gap: 8px; align-items: flex-start; margin-top: 12px;
+    padding: 11px; border-radius: 12px; background: #FFF8D8;
+    color: #755B00; font-size: 10.5px; line-height: 1.5;
+  }
+
+  /* COLLAPSIBLE */
+  .collapsible { margin-top: 12px; }
+  .collapse-btn {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--gray-600); cursor: pointer;
+    background: none; border: none; padding: 8px 0; width: 100%;
+    font-family: inherit;
+  }
+  .collapse-btn:hover { color: var(--gray-900); }
+  .collapse-btn .arrow { transition: transform .2s; font-size: 12px; }
+  .collapse-btn.open .arrow { transform: rotate(90deg); }
+  .collapse-content { display: none; padding-top: 12px; }
+  .collapse-content.open { display: block; }
+
+  /* API KEY GRID */
+  .key-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .key-item label { display: block; font-size: 11px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
+  .key-item input { width: 100%; padding: 9px 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200); font-size: 12px; font-family: monospace; outline: none; }
+  .key-item input:focus { border-color: var(--purple); }
+  .key-note { font-size: 11px; color: var(--gray-400); margin-top: 10px; display: flex; align-items: flex-start; gap: 5px; line-height: 1.5; }
+
+  /* BIG CTA BUTTON */
+  .btn-cta {
+    width: 100%; padding: 16px;
+    background: var(--purple); color: #fff;
+    border: none; border-radius: var(--radius);
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all .15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    letter-spacing: -.2px;
+  }
+  .btn-cta:hover { background: var(--purple-dark); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(124,58,237,.3); }
+  .btn-cta:active { transform: translateY(0); }
+  .btn-cta:disabled { background: var(--gray-200); color: var(--gray-400); cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* LOG */
+  .log-card {
+    background: var(--gray-900); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 16px;
+  }
+  .log-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .log-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: blink 1.2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .log-title { font-size: 12px; font-weight: 600; color: #fff; letter-spacing: .05em; text-transform: uppercase; }
+  .log-body { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11.5px; line-height: 1.9; max-height: 160px; overflow-y: auto; }
+  .log-body::-webkit-scrollbar { width: 4px; }
+  .log-body::-webkit-scrollbar-track { background: transparent; }
+  .log-body::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+  .le { display: flex; gap: 10px; }
+  .lt { color: #555; flex-shrink: 0; font-size: 10px; margin-top: 1px; }
+  .lok { color: #34D399; }
+  .lwait { color: #FCD34D; }
+  .lerr { color: #F87171; }
+  .lagent { color: #A78BFA; }
+  .linfo { color: #60A5FA; }
+
+  /* VIRAL SCORE */
+  .score-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .score-item {
+    background: var(--gray-50); border-radius: var(--radius-sm);
+    border: 1px solid var(--gray-200);
+    padding: 14px 10px; text-align: center;
+  }
+  .score-val { font-size: 26px; font-weight: 800; letter-spacing: -1px; margin-bottom: 2px; }
+  .score-bar { height: 4px; border-radius: 2px; background: var(--gray-200); margin: 6px 8px 6px; }
+  .score-fill { height: 100%; border-radius: 2px; transition: width .8s ease; }
+  .score-lbl { font-size: 11px; color: var(--gray-400); font-weight: 500; }
+
+  /* RESULT BLOCKS */
+  .result-block {
+    background: var(--gray-50); border-radius: var(--radius-sm);
+    border: 1px solid var(--gray-200);
+    padding: 16px; margin-bottom: 12px; position: relative;
+  }
+  .result-label { font-size: 10px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .result-text { font-size: 13px; color: var(--gray-800); line-height: 1.7; white-space: pre-wrap; }
+  .copy-btn {
+    position: absolute; top: 12px; right: 12px;
+    background: #fff; border: 1px solid var(--gray-200);
+    color: var(--gray-600); font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 6px; cursor: pointer;
+    transition: all .15s;
+  }
+  .copy-btn:hover { border-color: var(--purple); color: var(--purple); }
+  .copy-btn.copied { background: var(--green-light); border-color: var(--green); color: var(--green); }
+
+  /* GATE */
+  .gate-card {
+    background: #fff; border-radius: var(--radius);
+    border: 2px solid var(--gray-200); padding: 24px;
+    margin-bottom: 16px; transition: border-color .3s;
+  }
+  .gate-card.unlocked { border-color: var(--green); }
+  .gate-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .gate-icon { font-size: 22px; }
+  .gate-title { font-size: 16px; font-weight: 700; }
+  .gate-sub { font-size: 13px; color: var(--gray-600); margin-bottom: 18px; }
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .check-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-200); cursor: pointer;
+    font-size: 12px; font-weight: 500; color: var(--gray-700);
+    background: #fff; transition: all .15s;
+  }
+  .check-item:hover { border-color: var(--green); }
+  .check-item.on { border-color: var(--green); background: var(--green-light); color: #065F46; }
+  .check-item .chk { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--gray-300); display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; transition: all .15s; }
+  .check-item.on .chk { background: var(--green); border-color: var(--green); color: #fff; }
+  .gate-actions { display: flex; gap: 10px; }
+  .btn-approve {
+    flex: 1; padding: 14px; border-radius: var(--radius-sm);
+    background: var(--green); color: #fff; border: none;
+    font-size: 14px; font-weight: 700; cursor: pointer; transition: all .15s;
+  }
+  .btn-approve:disabled { background: var(--gray-200); color: var(--gray-400); cursor: not-allowed; }
+  .btn-approve:not(:disabled):hover { background: #059669; }
+  .btn-reject {
+    padding: 14px 20px; border-radius: var(--radius-sm);
+    background: transparent; color: var(--red); border: 1.5px solid #FECACA;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s;
+  }
+  .btn-reject:hover { background: #FEF2F2; }
+
+  /* PROOF */
+  .proof-card {
+    background: linear-gradient(135deg, #7C3AED, #5B21B6);
+    border-radius: var(--radius); padding: 28px; color: #fff;
+    text-align: center; margin-bottom: 16px;
+  }
+  .proof-check { font-size: 48px; margin-bottom: 12px; }
+  .proof-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .proof-sub { font-size: 13px; opacity: .8; margin-bottom: 20px; }
+  .proof-url {
+    background: rgba(255,255,255,.15); border-radius: var(--radius-sm);
+    padding: 10px 14px; font-size: 12px; word-break: break-all;
+    font-family: monospace; margin-bottom: 16px;
+  }
+  .proof-url a { color: #fff; }
+  .run-meta { font-size: 11px; opacity: .6; line-height: 1.7; }
+
+  /* RESTART */
+  .btn-restart {
+    width: 100%; padding: 14px; border-radius: var(--radius);
+    background: transparent; color: var(--purple);
+    border: 1.5px solid var(--purple-light);
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s;
+  }
+  .btn-restart:hover { background: var(--purple-light); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--gray-200);
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 12px; flex-wrap: wrap; }
+  .footer-links a { font-size: 12px; color: var(--gray-400); text-decoration: none; }
+  .footer-links a:hover { color: var(--gray-600); }
+  .footer-copy { font-size: 12px; color: var(--gray-400); }
+  .footer-logo { display: flex; align-items: baseline; gap: 1px; justify-content: center; margin-bottom: 12px; }
+  .footer-logo .v { font-size: 16px; font-weight: 800; color: var(--purple); letter-spacing: -1px; }
+  .footer-logo .yrl { font-size: 16px; font-weight: 800; color: var(--gray-400); letter-spacing: -1px; }
+
+  /* MODALS */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.5); z-index: 200;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: var(--radius);
+    padding: 28px; max-width: 500px; width: 100%;
+    max-height: 80vh; overflow-y: auto;
+  }
+  .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+  .modal p { font-size: 13px; color: var(--gray-600); line-height: 1.7; margin-bottom: 10px; }
+  .modal-close {
+    display: block; width: 100%; padding: 12px;
+    background: var(--gray-100); border: none; border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 16px;
+    color: var(--gray-700);
+  }
+  .modal-close:hover { background: var(--gray-200); }
+
+  /* INPUT */
+  .text-input {
+    width: 100%; padding: 10px 14px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-200); font-size: 14px;
+    outline: none; font-family: inherit; color: var(--gray-900);
+  }
+  .text-input:focus { border-color: var(--purple); }
+  .text-input::placeholder { color: var(--gray-400); }
+
+  .hidden { display: none !important; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spin { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 6px; }
+
+  /* VIDEO URL BOX */
+  .video-url-box {
+    background: var(--green-light); border-radius: var(--radius-sm);
+    padding: 10px 14px; margin-top: 8px;
+    font-size: 11px; color: #065F46; word-break: break-all; font-family: monospace;
+  }
+  .video-url-box a { color: #047857; }
+
+  /* GEN Z VISUAL REFRESH */
+  body {
+    background:
+      radial-gradient(circle at 8% 6%, rgba(255, 76, 180, .15), transparent 24rem),
+      radial-gradient(circle at 92% 18%, rgba(96, 72, 255, .18), transparent 25rem),
+      linear-gradient(180deg, #FCFBFF 0%, #F6F4FF 52%, #FFF 100%);
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; z-index: -1; inset: 0; pointer-events: none;
+    opacity: .38;
+    background-image: radial-gradient(rgba(74, 45, 138, .16) .7px, transparent .7px);
+    background-size: 18px 18px;
+    mask-image: linear-gradient(to bottom, #000, transparent 70%);
+  }
+  nav {
+    height: 68px; margin: 12px auto 0; width: calc(100% - 28px); max-width: 1180px;
+    border: 1px solid rgba(255,255,255,.8); border-radius: 22px;
+    background: rgba(255,255,255,.72); box-shadow: 0 14px 40px rgba(55,32,101,.08);
+  }
+  .nav-logo .v, .footer-logo .v {
+    background: linear-gradient(135deg, #FF3FA4, #7047EB);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .nav-badge {
+    background: #171221; color: #fff; padding: 4px 9px;
+    transform: rotate(-3deg); box-shadow: 2px 2px 0 #C9FF52;
+  }
+  .hero {
+    max-width: 860px; padding-top: 78px; padding-bottom: 34px;
+    position: relative;
+  }
+  .hero::before, .hero::after {
+    position: absolute; font-size: 40px; filter: drop-shadow(0 10px 15px rgba(83,45,157,.16));
+    animation: floaty 4s ease-in-out infinite;
+  }
+  .hero::before { content: '✨'; left: 5%; top: 94px; transform: rotate(-12deg); }
+  .hero::after { content: '💥'; right: 5%; top: 148px; animation-delay: -2s; }
+  @keyframes floaty { 50% { transform: translateY(-10px) rotate(6deg); } }
+  .hero-pill {
+    background: rgba(255,255,255,.78); border: 1px solid rgba(124,58,237,.18);
+    box-shadow: 0 8px 25px rgba(82,48,146,.10);
+    text-transform: uppercase; letter-spacing: .08em; font-size: 10px;
+  }
+  .hero h1 {
+    font-size: clamp(46px, 7vw, 76px); line-height: .99; letter-spacing: -4px;
+    margin: 18px auto 22px; max-width: 820px;
+  }
+  .hero h1 em {
+    display: inline-block; color: transparent;
+    background: linear-gradient(100deg, #FF3FA4 2%, #8A4FFF 47%, #4A7CFF 96%);
+    -webkit-background-clip: text; background-clip: text;
+    filter: drop-shadow(0 10px 24px rgba(124,58,237,.16));
+  }
+  .hero p { max-width: 650px; margin: 0 auto 28px; font-size: 17px; }
+  .social-proof {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    color: var(--gray-600); font-size: 12px; font-weight: 600;
+  }
+  .avatar-stack { display: flex; }
+  .avatar-stack span {
+    width: 29px; height: 29px; border-radius: 50%; display: grid; place-items: center;
+    background: #fff; border: 2px solid #fff; margin-left: -7px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.10);
+  }
+  .avatar-stack span:first-child { margin-left: 0; }
+  .trend-ticker {
+    width: 100%; overflow: hidden; margin: 12px 0 38px;
+    border-block: 1px solid rgba(124,58,237,.10);
+    background: rgba(255,255,255,.56); backdrop-filter: blur(12px);
+  }
+  .ticker-track {
+    display: flex; width: max-content; padding: 11px 0;
+    animation: ticker 30s linear infinite;
+  }
+  .ticker-track span {
+    font-size: 11px; font-weight: 800; letter-spacing: .08em;
+    text-transform: uppercase; color: #4C376F; padding: 0 26px;
+  }
+  .ticker-track b { color: #FF3FA4; }
+  @keyframes ticker { to { transform: translateX(-50%); } }
+  .how-it-works {
+    max-width: 880px; margin: 0 auto 38px; padding: 0 16px;
+  }
+  .how-title { text-align: center; margin-bottom: 16px; }
+  .how-title small {
+    color: var(--purple); font-weight: 800; letter-spacing: .12em;
+    text-transform: uppercase; font-size: 10px;
+  }
+  .how-title h2 { font-size: 24px; letter-spacing: -.8px; margin-top: 5px; }
+  .how-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  .how-card {
+    padding: 18px; border-radius: 20px; background: rgba(255,255,255,.76);
+    border: 1px solid rgba(124,58,237,.12); box-shadow: 0 15px 40px rgba(58,37,105,.06);
+    transform: rotate(-.5deg);
+  }
+  .how-card:nth-child(2) { transform: translateY(-5px) rotate(.7deg); background: linear-gradient(145deg,#F2EDFF,#FFF); }
+  .how-card:nth-child(3) { transform: rotate(-.3deg); }
+  .how-num {
+    width: 31px; height: 31px; display: grid; place-items: center; border-radius: 10px;
+    color: #fff; font-size: 12px; font-weight: 900; margin-bottom: 12px;
+    background: linear-gradient(135deg, #FF3FA4, #7548EA);
+    box-shadow: 3px 3px 0 #C9FF52;
+  }
+  .how-card h3 { font-size: 14px; margin-bottom: 5px; }
+  .how-card p { font-size: 11.5px; color: var(--gray-600); line-height: 1.55; }
+  .steps-bar {
+    background: rgba(255,255,255,.68); border: 1px solid rgba(124,58,237,.10);
+    border-radius: 24px; padding: 12px 18px; box-shadow: 0 12px 35px rgba(49,28,95,.06);
+  }
+  .main { max-width: 620px; }
+  .card, .result-block, .gate-card {
+    border-radius: 24px; border-color: rgba(124,58,237,.12);
+    box-shadow: 0 20px 55px rgba(54,35,97,.08);
+  }
+  .card { padding: 30px; background: rgba(255,255,255,.88); backdrop-filter: blur(14px); }
+  .card-icon {
+    width: 46px; height: 46px; border-radius: 15px;
+    background: linear-gradient(145deg,#F1E9FF,#FFEAF6);
+    box-shadow: 3px 3px 0 #D2FF67; transform: rotate(-4deg);
+  }
+  .trend-card, .hook-pill {
+    border-radius: 15px; background: rgba(255,255,255,.82);
+  }
+  .trend-card:hover, .hook-pill:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(92,51,166,.11); }
+  .trend-card.sel, .hook-pill.sel {
+    background: linear-gradient(120deg, #F0E9FF, #FFF0F8);
+    box-shadow: inset 0 0 0 1px rgba(124,58,237,.10);
+  }
+  .btn-cta, .btn-schedule {
+    background: linear-gradient(100deg, #FF3FA4, #7948E9 58%, #536DFF);
+    box-shadow: 0 13px 30px rgba(124,58,237,.28);
+  }
+  .btn-cta:hover, .btn-schedule:hover {
+    background: linear-gradient(100deg, #F82F9B, #6637D4 58%, #4059E8);
+  }
+  .autopilot-card {
+    background:
+      radial-gradient(circle at 100% 0, rgba(201,255,82,.28), transparent 10rem),
+      linear-gradient(145deg, rgba(248,244,255,.96), rgba(255,255,255,.95));
+    border-color: rgba(124,58,237,.28);
+  }
+  .status-pill.on { box-shadow: 2px 2px 0 #7BE8B9; }
+  input, select, .text-input { background: rgba(255,255,255,.88) !important; }
+
+  /* MOBILE */
+  @media (max-width: 480px) {
+    nav { padding: 0 14px; width: calc(100% - 16px); margin-top: 8px; }
+    .hero { padding-top: 50px; }
+    .hero h1 { font-size: 43px; letter-spacing: -2.6px; }
+    .hero p { font-size: 14px; }
+    .hero::before { left: 0; top: 70px; font-size: 27px; }
+    .hero::after { right: 0; top: 130px; font-size: 29px; }
+    .how-grid { grid-template-columns: 1fr; }
+    .how-card, .how-card:nth-child(2), .how-card:nth-child(3) { transform: none; }
+    .trend-grid { grid-template-columns: 1fr; }
+    .settings-row { grid-template-columns: 1fr; }
+    .score-grid { grid-template-columns: 1fr 1fr; }
+    .check-grid { grid-template-columns: 1fr; }
+    .key-grid { grid-template-columns: 1fr; }
+    .schedule-grid { grid-template-columns: 1fr; }
+    .channel-more { grid-template-columns: 1fr 1fr; }
+    .connect-fields { grid-template-columns: 1fr; }
+    .connect-wide { grid-column: auto; }
+    .dna-grid { grid-template-columns: 1fr; }
+    .dna-wide { grid-column: auto; }
+    .brief-grid { grid-template-columns: 1fr; }
+    .brief-wide { grid-column: auto; }
+    .easy-choice { grid-template-columns: 1fr; }
+    .simple-progress { gap: 4px; }
+    .simple-stage { padding: 8px 6px; font-size: 8px; }
+    .publish-credentials { grid-template-columns: 1fr; }
+    .card { padding: 20px; }
+    .nav-link { display: none; }
+    .steps-bar { margin-inline: 10px; }
+  }
+</style>
+</head>
+<body class="easy-connect">
+
+<!-- NAV -->
+<nav>
+  <div style="display:flex;align-items:center;">
+    <div class="nav-logo"><span class="v">v</span><span class="yrl">yrl</span></div>
+    <span class="nav-badge">Beta</span>
+  </div>
+  <div class="nav-right">
+    <a class="nav-link" onclick="openModal('impressum')" data-de="Impressum" data-en="Legal notice">Impressum</a>
+    <a class="nav-link" onclick="openModal('datenschutz')" data-de="Datenschutz" data-en="Privacy">Datenschutz</a>
+    <div class="lang-switch" aria-label="Language">
+      <button class="lang-btn active" id="lang-de" onclick="setLanguage('de')">DE</button>
+      <button class="lang-btn" id="lang-en" onclick="setLanguage('en')">EN</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-pill"><span></span><span data-de="Deine Idee. Jeden Tag. Automatisch." data-en="Your idea. Every day. Automatically.">Deine Idee. Jeden Tag. Automatisch.</span></div>
+  <h1 data-de="Aus einer Idee wird<br><em>täglicher Content.</em><br>Ganz automatisch." data-en="Turn one idea into<br><em>daily content.</em><br>On autopilot.">Aus einer Idee wird<br><em>täglicher Content.</em><br>Ganz automatisch.</h1>
+  <p data-de="Egal ob Food, Fitness, Beauty, Business, Reisen oder dein ganz eigenes Thema: auswählen, Uhrzeit setzen, posten lassen." data-en="Food, fitness, beauty, business, travel or your very own niche: choose a topic, set a time and let vyrl post.">Egal ob Food, Fitness, Beauty, Business, Reisen oder dein ganz eigenes Thema: auswählen, Uhrzeit setzen, posten lassen.</p>
+  <div class="social-proof">
+    <div class="avatar-stack"><span>👩🏽</span><span>🧑🏻</span><span>👨🏾</span><span>👩🏼</span></div>
+    <span data-de="Für Creator, Brands & Side Hustles – ohne Tech-Stress." data-en="For creators, brands and side hustles – without tech stress.">Für Creator, Brands & Side Hustles – ohne Tech-Stress.</span>
+  </div>
+</div>
+
+<div class="trend-ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span><b>●</b> Pick a vibe</span><span><b>●</b> Set your time</span><span><b>●</b> Post on autopilot</span><span><b>●</b> Any niche works</span><span><b>●</b> DE + EN</span>
+    <span><b>●</b> Pick a vibe</span><span><b>●</b> Set your time</span><span><b>●</b> Post on autopilot</span><span><b>●</b> Any niche works</span><span><b>●</b> DE + EN</span>
+  </div>
+</div>
+
+<section class="how-it-works">
+  <div class="how-title">
+    <small data-de="So easy ist das" data-en="It is this easy">So easy ist das</small>
+    <h2 data-de="Dein Content-Plan in drei Klicks." data-en="Your content plan in three clicks.">Dein Content-Plan in drei Klicks.</h2>
+  </div>
+  <div class="how-grid">
+    <article class="how-card">
+      <div class="how-num">01</div>
+      <h3 data-de="Sag uns dein Thema" data-en="Tell us your topic">Sag uns dein Thema</h3>
+      <p data-de="Nimm einen Vorschlag oder tippe einfach ein, worüber du posten möchtest." data-en="Pick an idea or simply type what you want to post about.">Nimm einen Vorschlag oder tippe einfach ein, worüber du posten möchtest.</p>
+    </article>
+    <article class="how-card">
+      <div class="how-num">02</div>
+      <h3 data-de="Wähle Uhrzeit & Vibe" data-en="Choose a time and vibe">Wähle Uhrzeit & Vibe</h3>
+      <p data-de="Du bestimmst Stil, Länge und wann dein täglicher Content erscheinen soll." data-en="Choose the style, length and daily publishing time.">Du bestimmst Stil, Länge und wann dein täglicher Content erscheinen soll.</p>
+    </article>
+    <article class="how-card">
+      <div class="how-num">03</div>
+      <h3 data-de="vyrl macht den Rest" data-en="vyrl does the rest">vyrl macht den Rest</h3>
+      <p data-de="Text, Caption, Video und Posting laufen automatisch über deine verbundenen Konten." data-en="Script, caption, video and publishing run through your connected accounts.">Text, Caption, Video und Posting laufen automatisch über deine verbundenen Konten.</p>
+    </article>
+  </div>
+</section>
+
+<div class="simple-progress">
+  <div class="simple-stage active" id="simple-stage-1"><span>1</span><span data-de="Idee festlegen" data-en="Define idea">Idee festlegen</span></div>
+  <div class="simple-stage" id="simple-stage-2"><span>2</span><span data-de="Plan wählen" data-en="Choose plan">Plan wählen</span></div>
+  <div class="simple-stage" id="simple-stage-3"><span>3</span><span data-de="Erstellen" data-en="Create">Erstellen</span></div>
+</div>
+
+<!-- STEPS -->
+<div class="steps-bar" id="steps-bar">
+  <div class="step-dot active" id="sd0"><div class="circle">1</div><div class="label" data-de="Thema" data-en="Topic">Thema</div></div>
+  <div class="step-line" id="sl0"></div>
+  <div class="step-dot" id="sd1"><div class="circle">2</div><div class="label" data-de="Stil" data-en="Style">Stil</div></div>
+  <div class="step-line" id="sl1"></div>
+  <div class="step-dot" id="sd2"><div class="circle">3</div><div class="label" data-de="Erstellen" data-en="Create">Erstellen</div></div>
+  <div class="step-line" id="sl2"></div>
+  <div class="step-dot" id="sd3"><div class="circle">4</div><div class="label" data-de="Check" data-en="Review">Check</div></div>
+  <div class="step-line" id="sl3"></div>
+  <div class="step-dot" id="sd4"><div class="circle">5</div><div class="label" data-de="Live" data-en="Live">Live</div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ── STEP 1: THEMA ── -->
+  <div id="step1">
+    <div class="card">
+      <div class="card-icon">🔥</div>
+      <h2 data-de="Worüber willst du posten?" data-en="What do you want to post about?">Worüber willst du posten?</h2>
+      <p class="sub" data-de="Wähle einfach den leichtesten Einstieg. Du kannst später alles verfeinern." data-en="Choose the easiest starting point. You can refine everything later.">Wähle einfach den leichtesten Einstieg. Du kannst später alles verfeinern.</p>
+
+      <div class="easy-choice">
+        <button class="easy-choice-btn active" type="button" data-topic-mode="own" onclick="setTopicMode('own',this)">
+          <span>✍️</span><strong data-de="Eigene Idee" data-en="My own idea">Eigene Idee</strong><small data-de="kurz beschreiben" data-en="describe it briefly">kurz beschreiben</small>
+        </button>
+        <button class="easy-choice-btn" type="button" data-topic-mode="analyze" onclick="setTopicMode('analyze',this)">
+          <span>🔎</span><strong data-de="Links analysieren" data-en="Analyze links">Links analysieren</strong><small data-de="Website oder Profile" data-en="website or profiles">Website oder Profile</small>
+        </button>
+        <button class="easy-choice-btn" type="button" data-topic-mode="ideas" onclick="setTopicMode('ideas',this)">
+          <span>✨</span><strong data-de="Inspiration" data-en="Inspiration">Inspiration</strong><small data-de="Vorschlag auswählen" data-en="pick a suggestion">Vorschlag auswählen</small>
+        </button>
+      </div>
+
+      <div class="mode-panel" id="topic-mode-ideas">
+      <div class="trend-grid" id="trend-grid">
+        <div class="trend-card sel" role="button" tabindex="0" style="--topic-bg:#FFF0E5;--topic-shadow:#FFC894;--topic-glow:rgba(255,143,64,.18);" onclick="selTrend(this,'Schnelle gesunde Rezepte für den Alltag','Praktische Rezepte, die einfach nachzumachen sind')">
+          <div class="topic-emoji">🍜</div>
+          <span class="tc-badge hot">🔥 HOT</span>
+          <div class="tc-name" data-de="Schnelle Rezepte" data-en="Quick recipes">Schnelle Rezepte</div>
+          <div class="tc-views" data-de="Einfache Ideen für Küche & Alltag" data-en="Simple ideas for food and everyday life">Einfache Ideen für Küche & Alltag</div>
+        </div>
+        <div class="trend-card" role="button" tabindex="0" style="--topic-bg:#ECFFF3;--topic-shadow:#9AEEB8;--topic-glow:rgba(54,211,123,.17);" onclick="selTrend(this,'Einfache Fitness-Routinen ohne Fitnessstudio','Motivierende Übungen für normale Menschen und wenig Zeit')">
+          <div class="topic-emoji">🏃‍♀️</div>
+          <span class="tc-badge hot">🔥 HOT</span>
+          <div class="tc-name" data-de="Fitness & Feel Good" data-en="Fitness & feel good">Fitness & Feel Good</div>
+          <div class="tc-views" data-de="Workouts, Motivation & gesunde Routinen" data-en="Workouts, motivation and healthy routines">Workouts, Motivation & gesunde Routinen</div>
+        </div>
+        <div class="trend-card" role="button" tabindex="0" style="--topic-bg:#EAF7FF;--topic-shadow:#9EDBFF;--topic-glow:rgba(54,171,239,.18);" onclick="selTrend(this,'Günstige Reiseziele und echte Geheimtipps','Konkrete Orte, Budgets und Tipps für Reisende')">
+          <div class="topic-emoji">🌴</div>
+          <span class="tc-badge rising">⚡ RISING</span>
+          <div class="tc-name" data-de="Travel & Abenteuer" data-en="Travel & adventure">Travel & Abenteuer</div>
+          <div class="tc-views" data-de="Geheimtipps, Orte & Reise-Stories" data-en="Hidden gems, places and travel stories">Geheimtipps, Orte & Reise-Stories</div>
+        </div>
+        <div class="trend-card" role="button" tabindex="0" style="--topic-bg:#FFF0F8;--topic-shadow:#FFB4D9;--topic-glow:rgba(255,63,164,.16);" onclick="selTrend(this,'Beauty und Skincare Tipps die wirklich alltagstauglich sind','Ehrliche Routinen, Produkte und Vorher-Nachher-Ergebnisse')">
+          <div class="topic-emoji">💅</div>
+          <span class="tc-badge rising">⚡ RISING</span>
+          <div class="tc-name" data-de="Beauty & Lifestyle" data-en="Beauty & lifestyle">Beauty & Lifestyle</div>
+          <div class="tc-views" data-de="Skincare, Mode & ehrliche Routinen" data-en="Skincare, fashion and honest routines">Skincare, Mode & ehrliche Routinen</div>
+        </div>
+        <div class="trend-card" role="button" tabindex="0" style="--topic-bg:#F3F7DF;--topic-shadow:#CDE875;--topic-glow:rgba(167,205,65,.18);" onclick="selTrend(this,'Persönliche Finanzen einfach erklärt','Sparideen und Geldwissen ohne komplizierte Fachsprache')">
+          <div class="topic-emoji">💸</div>
+          <span class="tc-badge rising">⚡ RISING</span>
+          <div class="tc-name" data-de="Money & Side Hustle" data-en="Money & side hustle">Money & Side Hustle</div>
+          <div class="tc-views" data-de="Sparen, Geldwissen & smarte Ideen" data-en="Saving, money knowledge and smart ideas">Sparen, Geldwissen & smarte Ideen</div>
+        </div>
+        <div class="trend-card" role="button" tabindex="0" style="--topic-bg:#F1EDFF;--topic-shadow:#C4B5FD;--topic-glow:rgba(124,58,237,.17);" onclick="selTrend(this,'Kleine Alltags-Hacks mit großem Effekt','Überraschende, nützliche Tipps für Haushalt, Arbeit und Freizeit')">
+          <div class="topic-emoji">🧠</div>
+          <span class="tc-badge evergreen">🌿 STABIL</span>
+          <div class="tc-name" data-de="Wissen & Lifehacks" data-en="Knowledge & life hacks">Wissen & Lifehacks</div>
+          <div class="tc-views" data-de="Aha-Momente, Tipps & Erklär-Content" data-en="Aha moments, tips and explainers">Aha-Momente, Tipps & Erklär-Content</div>
+        </div>
+      </div>
+      </div>
+
+      <div class="mode-panel active" id="topic-mode-own">
+      <div class="topic-custom-box">
+        <div class="custom-head">
+          <div class="custom-icon">✍️</div>
+          <div class="custom-copy">
+            <strong data-de="Schreib einfach dein eigenes Thema" data-en="Simply type your own topic">Schreib einfach dein eigenes Thema</strong>
+            <span data-de="Ein Wort oder ein ganzer Satz – vyrl versteht beides." data-en="One word or a full sentence – vyrl understands both.">Ein Wort oder ein ganzer Satz – vyrl versteht beides.</span>
+          </div>
+        </div>
+        <input type="text" class="text-input" id="custom-topic" data-placeholder-de="Worüber möchtest du posten?" data-placeholder-en="What would you like to post about?" placeholder="Worüber möchtest du posten?">
+        <div class="idea-chips">
+          <button class="idea-chip" type="button" onclick="useIdea(this)" data-idea-de="Hundetraining für Anfänger" data-idea-en="Dog training for beginners" data-de="🐶 Hund" data-en="🐶 Dogs">🐶 Hund</button>
+          <button class="idea-chip" type="button" onclick="useIdea(this)" data-idea-de="Bücher, die das Leben verändern" data-idea-en="Books that change your life" data-de="📚 Bücher" data-en="📚 Books">📚 Bücher</button>
+          <button class="idea-chip" type="button" onclick="useIdea(this)" data-idea-de="Zimmerpflanzen richtig pflegen" data-idea-en="How to care for houseplants" data-de="🪴 Pflanzen" data-en="🪴 Plants">🪴 Pflanzen</button>
+          <button class="idea-chip" type="button" onclick="useIdea(this)" data-idea-de="Dating und Beziehungen ehrlich besprochen" data-idea-en="Honest dating and relationship advice" data-de="💘 Dating" data-en="💘 Dating">💘 Dating</button>
+          <button class="idea-chip" type="button" onclick="useIdea(this)" data-idea-de="Musik entdecken und verstehen" data-idea-en="Discovering and understanding music" data-de="🎧 Musik" data-en="🎧 Music">🎧 Musik</button>
+        </div>
+      </div>
+      </div>
+
+      <details class="smart-brief mode-panel" id="topic-mode-analyze" open>
+        <summary>
+          <span class="brief-summary-title">
+            <span>🔎</span>
+            <span>
+              <strong data-de="Nische & Links analysieren lassen" data-en="Analyze your niche and links">Nische & Links analysieren lassen</strong>
+              <small data-de="Optional: Website, Profile oder Beispiel-Content einfügen" data-en="Optional: add a website, profiles or example content">Optional: Website, Profile oder Beispiel-Content einfügen</small>
+            </span>
+          </span>
+          <span class="brief-arrow">⌄</span>
+        </summary>
+        <div class="brief-body">
+          <div class="brief-grid">
+            <div class="brief-field brief-wide">
+              <label data-de="Beschreibe deine Nische in deinen Worten" data-en="Describe your niche in your own words">Beschreibe deine Nische in deinen Worten</label>
+              <textarea id="niche_description" data-placeholder-de="Was machst du, was weißt du besser als andere und welche Themen willst du besetzen?" data-placeholder-en="What do you do, what do you know better than others and which topics do you want to own?" placeholder="Was machst du, was weißt du besser als andere und welche Themen willst du besetzen?"></textarea>
+            </div>
+            <div class="brief-field">
+              <label data-de="Angebot / Produkt" data-en="Offer or product">Angebot / Produkt</label>
+              <input id="offer_description" data-placeholder-de="Was verkaufst oder empfiehlst du?" data-placeholder-en="What do you sell or recommend?" placeholder="Was verkaufst oder empfiehlst du?">
+            </div>
+            <div class="brief-field">
+              <label data-de="Dein besonderer Blickwinkel" data-en="Your unique angle">Dein besonderer Blickwinkel</label>
+              <input id="unique_angle" data-placeholder-de="Erfahrung, Methode, Meinung ..." data-placeholder-en="Experience, method, opinion ..." placeholder="Erfahrung, Methode, Meinung ...">
+            </div>
+            <div class="brief-field brief-wide">
+              <label data-de="Eigene Links" data-en="Your links">Eigene Links</label>
+              <textarea id="own_links" data-placeholder-de="Website, Instagram, TikTok, LinkedIn, YouTube – ein Link pro Zeile" data-placeholder-en="Website, Instagram, TikTok, LinkedIn, YouTube – one link per line" placeholder="Website, Instagram, TikTok, LinkedIn, YouTube – ein Link pro Zeile"></textarea>
+              <div class="link-hint" data-de="Nur öffentlich erreichbare Links. So erkennt vyrl deine Themen, Sprache, Angebote und bisherigen Inhalte." data-en="Public links only. This helps vyrl understand your topics, language, offers and existing content.">Nur öffentlich erreichbare Links. So erkennt vyrl deine Themen, Sprache, Angebote und bisherigen Inhalte.</div>
+            </div>
+            <div class="brief-field brief-wide">
+              <label data-de="Inspiration / Referenz-Content" data-en="Inspiration or reference content">Inspiration / Referenz-Content</label>
+              <textarea id="reference_links" data-placeholder-de="Links zu guten Posts, Videos, Creatorn oder Wettbewerbern – ein Link pro Zeile" data-placeholder-en="Links to strong posts, videos, creators or competitors – one per line" placeholder="Links zu guten Posts, Videos, Creatorn oder Wettbewerbern – ein Link pro Zeile"></textarea>
+              <div class="link-hint" data-de="vyrl analysiert Muster und Content-Lücken. Es kopiert keine Texte oder Ideen 1:1." data-en="vyrl analyzes patterns and content gaps. It does not copy posts or ideas word for word.">vyrl analysiert Muster und Content-Lücken. Es kopiert keine Texte oder Ideen 1:1.</div>
+            </div>
+          </div>
+          <button class="btn-analyze" id="btn-analyze-niche" type="button" onclick="analyzeNiche()" data-de="✨ Nische analysieren & Content-Strategie bauen" data-en="✨ Analyze niche and build content strategy">✨ Nische analysieren & Content-Strategie bauen</button>
+          <div class="brief-result" id="brief-result"></div>
+        </div>
+      </details>
+      <div class="smart-summary" id="topic-smart-summary">
+        <strong data-de="Du brauchst nur eine Idee." data-en="You only need an idea.">Du brauchst nur eine Idee.</strong>
+        <span data-de=" Zielgruppe, Stil und Format kann vyrl automatisch sinnvoll vorbelegen." data-en=" vyrl can automatically preselect audience, style and format."> Zielgruppe, Stil und Format kann vyrl automatisch sinnvoll vorbelegen.</span>
+      </div>
+    </div>
+
+    <button class="btn-cta" onclick="goToStep2()">
+      <span data-de="Weiter → Plan festlegen" data-en="Next → Set your plan">Weiter → Plan festlegen</span>
+    </button>
+  </div>
+
+  <!-- ── STEP 2: HOOK ── -->
+  <div id="step2" class="hidden">
+    <details class="advanced-content">
+      <summary><span data-de="✨ vyrl wählt Stil und Qualität automatisch" data-en="✨ Let vyrl choose style and quality automatically">✨ vyrl wählt Stil und Qualität automatisch</span><span class="optional-tag" data-de="Anpassen optional" data-en="Optional">Anpassen optional</span></summary>
+      <div class="advanced-inner">
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h2 data-de="Welcher Stil passt zu dir?" data-en="Which style fits you?">Welcher Stil passt zu dir?</h2>
+      <p class="sub" data-de="Wähle, wie dein Content Aufmerksamkeit bekommt. vyrl passt den Stil automatisch an dein Thema an." data-en="Choose how your content grabs attention. vyrl automatically adapts the style to your topic.">Wähle, wie dein Content Aufmerksamkeit bekommt. vyrl passt den Stil automatisch an dein Thema an.</p>
+
+      <div class="hook-grid" id="hook-grid">
+        <div class="hook-pill sel" onclick="selHook(this,'PROVOCATION','Statement das sofort Stop-the-Scroll erzwingt')">
+          <span class="emoji">😤</span>
+          <div class="hook-text">
+            <div class="hook-name" data-de="Mutige Aussage" data-en="Bold statement">Mutige Aussage</div>
+            <div class="hook-ex" data-de='"Fast alle machen diesen Fehler ..."' data-en='"Almost everyone makes this mistake ..."'>"Fast alle machen diesen Fehler ..."</div>
+          </div>
+        </div>
+        <div class="hook-pill" onclick="selHook(this,'NUMBER','Konkrete Zahl = sofortige Glaubwürdigkeit')">
+          <span class="emoji">🔢</span>
+          <div class="hook-text">
+            <div class="hook-name" data-de="Zahl & Fakt" data-en="Number & fact">Zahl & Fakt</div>
+            <div class="hook-ex" data-de='"3 Dinge, die sofort einen Unterschied machen"' data-en='"3 things that make an immediate difference"'>"3 Dinge, die sofort einen Unterschied machen"</div>
+          </div>
+        </div>
+        <div class="hook-pill" onclick="selHook(this,'CURIOSITY','Neugier-Gap zwingt zum Weiterschauen')">
+          <span class="emoji">🤔</span>
+          <div class="hook-text">
+            <div class="hook-name" data-de="Neugier" data-en="Curiosity">Neugier</div>
+            <div class="hook-ex" data-de='"Was passiert, wenn du das 7 Tage testest?"' data-en='"What happens if you try this for 7 days?"'>"Was passiert, wenn du das 7 Tage testest?"</div>
+          </div>
+        </div>
+        <div class="hook-pill" onclick="selHook(this,'POV','POV-Format hat höchste Completion Rate 2026')">
+          <span class="emoji">👁️</span>
+          <div class="hook-text">
+            <div class="hook-name" data-de="POV / Alltag" data-en="POV / relatable">POV / Alltag</div>
+            <div class="hook-ex" data-de='"POV: Du entdeckst endlich den einfachen Weg"' data-en='"POV: You finally discover the easy way"'>"POV: Du entdeckst endlich den einfachen Weg"</div>
+          </div>
+        </div>
+        <div class="hook-pill" onclick="selHook(this,'BEFORE_AFTER','Transformation zeigen = höchste Share-Rate')">
+          <span class="emoji">✨</span>
+          <div class="hook-text">
+            <div class="hook-name" data-de="Vorher / Nachher" data-en="Before / after">Vorher / Nachher</div>
+            <div class="hook-ex" data-de='"Vorher: kompliziert. Nachher: in 10 Minuten erledigt."' data-en='"Before: complicated. After: done in 10 minutes."'>"Vorher: kompliziert. Nachher: in 10 Minuten erledigt."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card dna-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;">
+        <div class="card-icon" style="margin:0;">🧬</div>
+        <div>
+          <h2 data-de="Deine Content DNA" data-en="Your Content DNA">Deine Content DNA</h2>
+          <p class="sub" style="margin:2px 0 0;" data-de="Je genauer du bist, desto weniger klingt das Ergebnis nach KI-Einheitsbrei." data-en="The more specific you are, the less the result sounds like generic AI content.">Je genauer du bist, desto weniger klingt das Ergebnis nach KI-Einheitsbrei.</p>
+        </div>
+      </div>
+      <div class="dna-grid" style="margin-top:18px;">
+        <div class="dna-item">
+          <label data-de="Für wen?" data-en="Who is it for?">Für wen?</label>
+          <input id="audience" data-placeholder-de="z. B. Berufstätige Eltern, Anfänger ..." data-placeholder-en="e.g. busy parents, beginners ..." placeholder="z. B. Berufstätige Eltern, Anfänger ...">
+        </div>
+        <div class="dna-item">
+          <label data-de="Was soll es bewirken?" data-en="What should it achieve?">Was soll es bewirken?</label>
+          <select id="content_goal">
+            <option value="teach" data-de="Etwas wirklich beibringen" data-en="Teach something useful">Etwas wirklich beibringen</option>
+            <option value="authority" data-de="Expertise zeigen" data-en="Build authority">Expertise zeigen</option>
+            <option value="discussion" data-de="Diskussion auslösen" data-en="Start a discussion">Diskussion auslösen</option>
+            <option value="conversion" data-de="Anfragen / Verkäufe erzeugen" data-en="Drive leads or sales">Anfragen / Verkäufe erzeugen</option>
+            <option value="entertain" data-de="Unterhalten" data-en="Entertain">Unterhalten</option>
+          </select>
+        </div>
+        <div class="dna-item">
+          <label data-de="Wissensniveau" data-en="Knowledge level">Wissensniveau</label>
+          <select id="expertise">
+            <option value="beginner" data-de="Einsteiger – einfach erklärt" data-en="Beginner – simply explained">Einsteiger – einfach erklärt</option>
+            <option value="intermediate" selected data-de="Fortgeschritten – konkret" data-en="Intermediate – concrete">Fortgeschritten – konkret</option>
+            <option value="expert" data-de="Experten – mit Tiefe" data-en="Expert – in depth">Experten – mit Tiefe</option>
+          </select>
+        </div>
+        <div class="dna-item">
+          <label data-de="Stimme der Marke" data-en="Brand voice">Stimme der Marke</label>
+          <select id="voice">
+            <option value="direct" data-de="Direkt & klar" data-en="Direct and clear">Direkt & klar</option>
+            <option value="warm" data-de="Warm & menschlich" data-en="Warm and human">Warm & menschlich</option>
+            <option value="bold" data-de="Mutig & meinungsstark" data-en="Bold and opinionated">Mutig & meinungsstark</option>
+            <option value="premium" data-de="Ruhig & hochwertig" data-en="Calm and premium">Ruhig & hochwertig</option>
+            <option value="funny" data-de="Locker & witzig" data-en="Casual and funny">Locker & witzig</option>
+          </select>
+        </div>
+        <div class="dna-item dna-wide">
+          <label data-de="Was muss unbedingt rein?" data-en="What must be included?">Was muss unbedingt rein?</label>
+          <textarea id="must_include" data-placeholder-de="Eigene Erfahrung, konkrete Fakten, Produkt, Meinung, Beispiel oder Botschaft ..." data-placeholder-en="Your experience, facts, product, opinion, example or key message ..." placeholder="Eigene Erfahrung, konkrete Fakten, Produkt, Meinung, Beispiel oder Botschaft ..."></textarea>
+        </div>
+        <div class="dna-item dna-wide">
+          <label data-de="Was soll vermieden werden?" data-en="What should be avoided?">Was soll vermieden werden?</label>
+          <input id="avoid_content" data-placeholder-de="z. B. leere Floskeln, übertriebene Claims, Fachsprache ..." data-placeholder-en="e.g. empty phrases, exaggerated claims, jargon ..." placeholder="z. B. leere Floskeln, übertriebene Claims, Fachsprache ...">
+        </div>
+        <div class="dna-item dna-wide">
+          <label data-de="Qualitätsmodus" data-en="Quality mode">Qualitätsmodus</label>
+          <div class="quality-options">
+            <button class="quality-option" type="button" data-quality="speed" onclick="selectQuality(this)"><strong data-de="⚡ Schnell" data-en="⚡ Fast">⚡ Schnell</strong><small data-de="günstiger" data-en="lower cost">günstiger</small></button>
+            <button class="quality-option active" type="button" data-quality="balanced" onclick="selectQuality(this)"><strong data-de="✨ Smart" data-en="✨ Smart">✨ Smart</strong><small data-de="beste Balance" data-en="best balance">beste Balance</small></button>
+            <button class="quality-option" type="button" data-quality="quality" onclick="selectQuality(this)"><strong data-de="🏆 Premium" data-en="🏆 Premium">🏆 Premium</strong><small data-de="max. Qualität" data-en="max quality">max. Qualität</small></button>
+          </div>
+        </div>
+        <label class="research-toggle dna-wide">
+          <input type="checkbox" id="web_research" checked>
+          <span data-de="<strong>Aktuell recherchieren:</strong> OpenRouter sucht vor der Erstellung nach relevanten, aktuellen Informationen und Quellen. Kostet etwas extra, verhindert aber veralteten 08/15-Content." data-en="<strong>Research current information:</strong> OpenRouter searches for relevant, current information and sources before writing. It costs a little extra but avoids stale generic content."><strong>Aktuell recherchieren:</strong> OpenRouter sucht vor der Erstellung nach relevanten, aktuellen Informationen und Quellen. Kostet etwas extra, verhindert aber veralteten 08/15-Content.</span>
+        </label>
+      </div>
+    </div>
+      </div>
+    </details>
+
+    <div class="card autopilot-card">
+      <div class="autopilot-head">
+        <div>
+          <div class="autopilot-title">⏰ <span data-de="Daily Autopilot" data-en="Daily Autopilot">Daily Autopilot</span></div>
+          <p class="sub" style="margin:5px 0 0;" data-de="Einmal einstellen. Jeden Tag neuen Content erstellen und posten." data-en="Set it once. Create and publish fresh content every day.">Einmal einstellen. Jeden Tag neuen Content erstellen und posten.</p>
+        </div>
+        <span class="status-pill" id="schedule-status" data-de="NICHT AKTIV" data-en="NOT ACTIVE">NICHT AKTIV</span>
+      </div>
+      <div class="schedule-grid">
+        <div class="setting-item">
+          <label data-de="Täglich um" data-en="Every day at">Täglich um</label>
+          <input type="time" id="schedule-time" value="18:30">
+        </div>
+        <div class="setting-item">
+          <label data-de="Zeitzone" data-en="Time zone">Zeitzone</label>
+          <select id="schedule-zone">
+            <option value="local" data-de="Meine lokale Zeit" data-en="My local time">Meine lokale Zeit</option>
+            <option value="Europe/Berlin">Europe/Berlin</option>
+            <option value="Europe/London">Europe/London</option>
+            <option value="America/New_York">America/New_York</option>
+          </select>
+        </div>
+      </div>
+      <div class="channel-box">
+        <span class="provider-label" data-de="Wo soll gepostet werden?" data-en="Where should it be posted?">Wo soll gepostet werden?</span>
+        <div class="channel-primary">
+          <button class="channel-btn selected" type="button" data-channel="instagram" onclick="toggleChannel(this)">
+            <span class="channel-icon">📸</span><span><strong>Instagram</strong><small data-de="Reels & Feed" data-en="Reels & feed">Reels & Feed</small></span>
+          </button>
+          <button class="channel-btn" type="button" data-channel="tiktok" onclick="toggleChannel(this)">
+            <span class="channel-icon">🎵</span><span><strong>TikTok</strong><small data-de="Kurzvideos" data-en="Short videos">Kurzvideos</small></span>
+          </button>
+        </div>
+        <button class="more-channels" id="more-channels-btn" type="button" onclick="toggleMoreChannels()" data-de="+ Mehr Plattformen anzeigen" data-en="+ Show more platforms">+ Mehr Plattformen anzeigen</button>
+        <div class="channel-more" id="channel-more">
+          <button class="channel-btn" type="button" data-channel="linkedin" onclick="toggleChannel(this)">
+            <span class="channel-icon">💼</span><span><strong>LinkedIn</strong><small data-de="Posts & Video" data-en="Posts & video">Posts & Video</small></span>
+          </button>
+          <button class="channel-btn" type="button" data-channel="facebook" onclick="toggleChannel(this)">
+            <span class="channel-icon">👥</span><span><strong>Facebook</strong><small data-de="Seite & Reels" data-en="Page & reels">Seite & Reels</small></span>
+          </button>
+          <button class="channel-btn" type="button" data-channel="x" onclick="toggleChannel(this)">
+            <span class="channel-icon">𝕏</span><span><strong>X</strong><small data-de="Posts & Video" data-en="Posts & video">Posts & Video</small></span>
+          </button>
+          <button class="channel-btn" type="button" data-channel="youtube" onclick="toggleChannel(this)">
+            <span class="channel-icon">▶️</span><span><strong>YouTube</strong><small>Shorts</small></span>
+          </button>
+          <button class="channel-btn" type="button" data-channel="threads" onclick="toggleChannel(this)">
+            <span class="channel-icon">🧵</span><span><strong>Threads</strong><small data-de="Text-Posts" data-en="Text posts">Text-Posts</small></span>
+          </button>
+        </div>
+        <div class="channel-summary" id="channel-summary"></div>
+        <div class="channel-help" id="channel-help"></div>
+      </div>
+      <label class="toggle-row">
+        <input type="checkbox" id="auto-publish" checked>
+        <span data-de="Content automatisch generieren, Video erstellen und ohne manuelle Freigabe posten." data-en="Automatically generate the content, create the video and publish without manual approval.">Content automatisch generieren, Video erstellen und ohne manuelle Freigabe posten.</span>
+      </label>
+      <div class="schedule-summary" id="schedule-summary">
+        <strong data-de="Noch kein Tagesplan aktiv." data-en="No daily schedule is active yet.">Noch kein Tagesplan aktiv.</strong>
+        <span data-de=" Wähle eine Uhrzeit und aktiviere den Autopilot." data-en=" Choose a time and activate the autopilot."> Wähle eine Uhrzeit und aktiviere den Autopilot.</span>
+      </div>
+      <div class="schedule-actions">
+        <button class="btn-small btn-schedule" onclick="saveSchedule()" data-de="Autopilot aktivieren" data-en="Activate autopilot">Autopilot aktivieren</button>
+        <button class="btn-small btn-stop" onclick="stopSchedule()" data-de="Stoppen" data-en="Stop">Stoppen</button>
+      </div>
+      <div class="automation-note" data-de="Browser-Version: Die Seite muss geöffnet bleiben und die API-Zugänge müssen vorhanden sein. Für zuverlässige 24/7-Posts braucht die Live-Version einen kleinen Server-Scheduler (z. B. Netlify Scheduled Functions)." data-en="Browser version: This page must remain open and API access must be available. Reliable 24/7 posting requires a small server scheduler in the live version (e.g. Netlify Scheduled Functions).">Browser-Version: Die Seite muss geöffnet bleiben und die API-Zugänge müssen vorhanden sein. Für zuverlässige 24/7-Posts braucht die Live-Version einen kleinen Server-Scheduler (z. B. Netlify Scheduled Functions).</div>
+    </div>
+
+    <!-- Einstellungen aufklappbar -->
+    <details class="advanced-content">
+      <summary><span data-de="⚙️ Weitere Einstellungen & Verbindungen" data-en="⚙️ More settings and connections">⚙️ Weitere Einstellungen & Verbindungen</span><span class="optional-tag" data-de="nur bei Bedarf" data-en="only if needed">nur bei Bedarf</span></summary>
+      <div class="advanced-inner">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="font-size:18px;">⚙️</span>
+        <span style="font-size:15px;font-weight:700;" data-de="Content-Einstellungen" data-en="Content settings">Content-Einstellungen</span>
+      </div>
+      <p class="sub" style="margin-bottom:14px;" data-de="Länge, Format und gewünschte Reaktion." data-en="Length, format and desired audience action.">Länge, Format und gewünschte Reaktion.</p>
+      <div class="settings-row">
+        <div class="setting-item">
+          <label data-de="Länge" data-en="Length">Länge</label>
+          <select id="dur">
+            <option value="4" data-de="4 Sek — Ultra Hook" data-en="4 sec — Ultra hook">4 Sek — Ultra Hook</option>
+            <option value="15" data-de="15 Sek — Max. Reichweite" data-en="15 sec — Max reach">15 Sek — Max. Reichweite</option>
+            <option value="30" selected data-de="30 Sek — Sweet Spot" data-en="30 sec — Sweet spot">30 Sek — Sweet Spot</option>
+            <option value="60" data-de="60 Sek — Mehr Tiefe" data-en="60 sec — Deep dive">60 Sek — Mehr Tiefe</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label data-de="Format" data-en="Format">Format</label>
+          <select id="fmt">
+            <option value="list" selected data-de="Liste / Tipps" data-en="List / tips">Liste / Tipps</option>
+            <option value="tutorial" data-de="Anleitung" data-en="Tutorial">Anleitung</option>
+            <option value="story" data-de="Story / POV" data-en="Story / POV">Story / POV</option>
+            <option value="comparison" data-de="Vergleich" data-en="Comparison">Vergleich</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label data-de="Ziel" data-en="Goal">Ziel</label>
+          <select id="cta">
+            <option value="save" selected data-de="💾 Speichern" data-en="💾 Save">💾 Speichern</option>
+            <option value="share" data-de="📤 Teilen" data-en="📤 Share">📤 Teilen</option>
+            <option value="follow" data-de="❤️ Folgen" data-en="❤️ Follow">❤️ Folgen</option>
+            <option value="link" data-de="🔗 Link in Bio" data-en="🔗 Link in bio">🔗 Link in Bio</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- API Keys aufklappbar -->
+      <div class="collapsible">
+        <button class="collapse-btn" id="api-toggle" onclick="toggleCollapse('api-content','api-toggle')">
+          <span class="arrow">▶</span> <span data-de="Verbindungen & API-Zugänge" data-en="Connections & API access">Verbindungen & API-Zugänge</span>
+        </button>
+        <div class="collapse-content" id="api-content">
+          <div class="connection-intro">
+            <strong data-de="Was ist das überhaupt?" data-en="What is this?">Was ist das überhaupt?</strong><br>
+            <span data-de="Diese Zugänge verbinden vyrl mit den Diensten, die den Text schreiben, das Video bauen und auf Instagram posten. Klicke bei jedem Feld auf das ?, wenn du Hilfe brauchst." data-en="These credentials connect vyrl to the services that write the text, create the video and publish it to Instagram. Click the ? next to any field for help.">Diese Zugänge verbinden vyrl mit den Diensten, die den Text schreiben, das Video bauen und auf Instagram posten. Klicke bei jedem Feld auf das ?, wenn du Hilfe brauchst.</span>
+          </div>
+          <span class="provider-label" data-de="1. KI-Anbieter auswählen" data-en="1. Choose your AI provider">1. KI-Anbieter auswählen</span>
+          <div class="provider-picker">
+            <button class="provider-btn active" id="provider-claude" type="button" onclick="selectAIProvider('claude')">
+              <span class="provider-logo">🧠</span>
+              <span><strong>Claude</strong><small data-de="Direkt über Anthropic" data-en="Directly via Anthropic">Direkt über Anthropic</small></span>
+            </button>
+            <button class="provider-btn" id="provider-openrouter" type="button" onclick="selectAIProvider('openrouter')">
+              <span class="provider-logo">↗️</span>
+              <span><strong>OpenRouter</strong><small data-de="Viele KI-Modelle mit einem Key" data-en="Many AI models with one key">Viele KI-Modelle mit einem Key</small></span>
+            </button>
+          </div>
+          <span class="provider-label" data-de="2. Passenden Zugang eintragen" data-en="2. Add the matching access key">2. Passenden Zugang eintragen</span>
+          <div class="oauth-hub">
+            <div class="oauth-hub-head">
+              <span>
+                <strong data-de="Socials mit einem Klick verbinden" data-en="Connect social accounts in one click">Socials mit einem Klick verbinden</strong>
+                <small data-de="Einloggen, Zugriff erlauben, fertig. vyrl findet Seiten und Konten automatisch." data-en="Sign in, approve access, done. vyrl detects pages and accounts automatically.">Einloggen, Zugriff erlauben, fertig. vyrl findet Seiten und Konten automatisch.</small>
+              </span>
+              <span class="easy-badge">EMPFOHLEN</span>
+            </div>
+            <div class="oauth-list" id="oauth-list"></div>
+            <div class="oauth-note" data-de="Sicherer Standard: Tokens und Secrets bleiben auf dem Server und werden dort automatisch erneuert. Die HTML-Datei zeigt keine geheimen Zugangsdaten." data-en="Secure by default: tokens and secrets stay on the server and are refreshed automatically. The HTML file never exposes secret credentials.">Sicherer Standard: Tokens und Secrets bleiben auf dem Server und werden dort automatisch erneuert. Die HTML-Datei zeigt keine geheimen Zugangsdaten.</div>
+            <button type="button" class="more-channels" style="color:#D7FF75;text-align:left;padding-left:0;" onclick="toggleManualConnect()" id="manual-connect-btn" data-de="Technische Einrichtung manuell anzeigen" data-en="Show manual technical setup">Technische Einrichtung manuell anzeigen</button>
+          </div>
+          <div class="key-grid">
+            <div class="key-item provider-field" data-provider="claude">
+              <div class="key-label-row"><label>Claude API Key</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-ai',this)" aria-label="Claude API Key Hilfe">?</button></div>
+              <input type="password" id="ai_key" placeholder="sk-ant-...">
+            </div>
+            <div class="key-item provider-field hidden-provider" data-provider="openrouter">
+              <div class="key-label-row"><label>OpenRouter API Key</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-openrouter',this)" aria-label="OpenRouter API Key Hilfe">?</button></div>
+              <input type="password" id="openrouter_key" placeholder="sk-or-v1-...">
+            </div>
+            <div class="key-item provider-field hidden-provider" data-provider="openrouter">
+              <div class="key-label-row"><label data-de="KI-Modell" data-en="AI model">KI-Modell</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-model',this)" aria-label="KI-Modell Hilfe">?</button></div>
+              <select id="openrouter_model">
+                <option value="openrouter/auto" data-de="✨ Automatisch auswählen" data-en="✨ Choose automatically">✨ Automatisch auswählen</option>
+                <option value="~anthropic/claude-sonnet-latest">Claude Sonnet – Latest</option>
+                <option value="~openai/gpt-latest">GPT – Latest</option>
+                <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
+              </select>
+            </div>
+            <div class="video-engine-box provider-field hidden-provider" data-provider="openrouter" style="grid-column:1/-1;">
+              <div class="video-engine-head">
+                <strong data-de="🎬 Video-Generator: automatisch" data-en="🎬 Video generator: automatic">🎬 Video-Generator: automatisch</strong>
+                <span>OPENROUTER VIDEO</span>
+              </div>
+              <p data-de="vyrl lädt beim Start die aktuell verfügbaren Videomodelle, filtert auf 9:16 und wählt nach deinem Qualitätsmodus automatisch das beste passende Modell. Creatomate wird dafür nicht mehr benötigt." data-en="At runtime, vyrl loads the currently available video models, filters for 9:16 and automatically chooses the best match for your quality mode. Creatomate is no longer required.">vyrl lädt beim Start die aktuell verfügbaren Videomodelle, filtert auf 9:16 und wählt nach deinem Qualitätsmodus automatisch das beste passende Modell. Creatomate wird dafür nicht mehr benötigt.</p>
+            </div>
+            <div class="key-item legacy-video-field" style="display:none;">
+              <div class="key-label-row"><label>Creatomate API Key</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-cm',this)" aria-label="Creatomate API Key Hilfe">?</button></div>
+              <input type="password" id="cm_key" placeholder="ck_live_...">
+            </div>
+            <div class="key-help" id="help-ai">
+              <strong data-de="Damit schreibt die KI deinen Content." data-en="This lets the AI write your content.">Damit schreibt die KI deinen Content.</strong>
+              <ol>
+                <li data-de="Öffne die Claude Platform und melde dich an." data-en="Open the Claude Platform and sign in.">Öffne die Claude Platform und melde dich an.</li>
+                <li data-de="Klicke auf „Create Key“ und gib ihm z. B. den Namen „vyrl“." data-en="Click “Create Key” and name it “vyrl”, for example.">Klicke auf „Create Key“ und gib ihm z. B. den Namen „vyrl“.</li>
+                <li data-de="Kopiere den Key sofort und füge ihn oben ein." data-en="Copy the key immediately and paste it above.">Kopiere den Key sofort und füge ihn oben ein.</li>
+              </ol>
+              <a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener" data-de="Claude API Keys öffnen ↗" data-en="Open Claude API Keys ↗">Claude API Keys öffnen ↗</a>
+            </div>
+            <div class="key-help" id="help-openrouter">
+              <strong data-de="Ein Key für viele verschiedene KI-Modelle." data-en="One key for many different AI models.">Ein Key für viele verschiedene KI-Modelle.</strong>
+              <ol>
+                <li data-de="Öffne OpenRouter und erstelle kostenlos ein Konto." data-en="Open OpenRouter and create an account.">Öffne OpenRouter und erstelle kostenlos ein Konto.</li>
+                <li data-de="Gehe zu „Keys“ und klicke auf „Create Key“." data-en="Go to “Keys” and click “Create Key”.">Gehe zu „Keys“ und klicke auf „Create Key“.</li>
+                <li data-de="Kopiere den Key und füge ihn oben ein. Für kostenpflichtige Modelle brauchst du Guthaben." data-en="Copy the key and paste it above. Paid models require account credit.">Kopiere den Key und füge ihn oben ein. Für kostenpflichtige Modelle brauchst du Guthaben.</li>
+              </ol>
+              <a href="https://openrouter.ai/settings/keys" target="_blank" rel="noopener" data-de="OpenRouter Key erstellen ↗" data-en="Create an OpenRouter key ↗">OpenRouter Key erstellen ↗</a>
+            </div>
+            <div class="key-help" id="help-model">
+              <strong data-de="Du musst kein Modell verstehen." data-en="You do not need to understand the models.">Du musst kein Modell verstehen.</strong>
+              <span data-de="Lass „Automatisch auswählen“ aktiv, wenn du unsicher bist. Alternativ kannst du per Klick Claude, GPT oder Gemini verwenden." data-en="Keep “Choose automatically” selected if you are unsure. Or choose Claude, GPT or Gemini with one click.">Lass „Automatisch auswählen“ aktiv, wenn du unsicher bist. Alternativ kannst du per Klick Claude, GPT oder Gemini verwenden.</span><br><br>
+              <a href="https://openrouter.ai/models" target="_blank" rel="noopener" data-de="Alle OpenRouter-Modelle ansehen ↗" data-en="Browse all OpenRouter models ↗">Alle OpenRouter-Modelle ansehen ↗</a>
+            </div>
+            <div class="key-help legacy-video-field" style="display:none;" id="help-cm">
+              <strong data-de="Damit wird aus deinem Text ein fertiges Video." data-en="This turns your script into a finished video.">Damit wird aus deinem Text ein fertiges Video.</strong>
+              <ol>
+                <li data-de="Erstelle ein kostenloses Creatomate-Konto." data-en="Create a Creatomate account.">Erstelle ein kostenloses Creatomate-Konto.</li>
+                <li data-de="Öffne im Dashboard die Projekteinstellungen und kopiere deinen API Key." data-en="Open the project settings in your dashboard and copy the API key.">Öffne im Dashboard die Projekteinstellungen und kopiere deinen API Key.</li>
+                <li data-de="Füge ihn in das Feld oben ein." data-en="Paste it into the field above.">Füge ihn in das Feld oben ein.</li>
+              </ol>
+              <a href="https://creatomate.com/docs/api/introduction" target="_blank" rel="noopener" data-de="Creatomate-Anleitung öffnen ↗" data-en="Open the Creatomate guide ↗">Creatomate-Anleitung öffnen ↗</a>
+            </div>
+            <div class="key-item legacy-video-field" style="display:none;">
+              <div class="key-label-row"><label>Template ID</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-template',this)" aria-label="Template ID Hilfe">?</button></div>
+              <input type="text" id="cm_tpl" placeholder="abcd1234...">
+            </div>
+            <div class="key-item channel-credential" data-channel-credential="instagram">
+              <div class="key-label-row"><label>Instagram Token</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-ig',this)" aria-label="Instagram Token Hilfe">?</button></div>
+              <input type="password" id="ig_tok" placeholder="EAABsb...">
+            </div>
+            <div class="key-help legacy-video-field" style="display:none;" id="help-template">
+              <strong data-de="Das ist das Design, das jedes Video benutzt." data-en="This is the design used for every video.">Das ist das Design, das jedes Video benutzt.</strong>
+              <ol>
+                <li data-de="Öffne in Creatomate ein Reel-Template oder erstelle dein eigenes." data-en="Open a Reel template in Creatomate or create your own.">Öffne in Creatomate ein Reel-Template oder erstelle dein eigenes.</li>
+                <li data-de="Die Template ID findest du in den Template-Details bzw. in der URL." data-en="Find the template ID in the template details or URL.">Die Template ID findest du in den Template-Details bzw. in der URL.</li>
+                <li data-de="Kopiere nur die ID, nicht die komplette URL." data-en="Copy only the ID, not the full URL.">Kopiere nur die ID, nicht die komplette URL.</li>
+              </ol>
+              <a href="https://creatomate.com/docs/fundamentals/getting-started/what-is-a-template" target="_blank" rel="noopener" data-de="Template-Hilfe öffnen ↗" data-en="Open template help ↗">Template-Hilfe öffnen ↗</a>
+            </div>
+            <div class="key-help channel-credential" data-channel-credential="instagram" id="help-ig">
+              <strong data-de="Damit darf vyrl auf deinem Instagram-Konto posten." data-en="This allows vyrl to publish to your Instagram account.">Damit darf vyrl auf deinem Instagram-Konto posten.</strong>
+              <ol>
+                <li data-de="Dein Instagram-Konto muss ein Professional-Konto sein und mit einer Facebook-Seite verbunden sein." data-en="Your Instagram account must be a Professional account connected to a Facebook Page.">Dein Instagram-Konto muss ein Professional-Konto sein und mit einer Facebook-Seite verbunden sein.</li>
+                <li data-de="Erstelle in Meta for Developers eine App und richte die Instagram API ein." data-en="Create an app in Meta for Developers and configure the Instagram API.">Erstelle in Meta for Developers eine App und richte die Instagram API ein.</li>
+                <li data-de="Der Token braucht die Berechtigung zum Veröffentlichen von Instagram-Inhalten." data-en="The token needs permission to publish Instagram content.">Der Token braucht die Berechtigung zum Veröffentlichen von Instagram-Inhalten.</li>
+              </ol>
+              <a href="https://developers.facebook.com/docs/instagram-platform/content-publishing" target="_blank" rel="noopener" data-de="Offizielle Instagram-Anleitung öffnen ↗" data-en="Open the official Instagram guide ↗">Offizielle Instagram-Anleitung öffnen ↗</a>
+            </div>
+            <div class="key-item channel-credential" data-channel-credential="instagram">
+              <div class="key-label-row"><label>Instagram Account ID</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-id',this)" aria-label="Instagram Account ID Hilfe">?</button></div>
+              <input type="text" id="ig_acc" placeholder="17841...">
+            </div>
+            <div class="key-help channel-credential" data-channel-credential="instagram" id="help-id">
+              <strong data-de="Das ist die technische Nummer deines Instagram-Kontos." data-en="This is the technical ID of your Instagram account.">Das ist die technische Nummer deines Instagram-Kontos.</strong>
+              <ol>
+                <li data-de="Öffne den Meta Graph API Explorer." data-en="Open the Meta Graph API Explorer.">Öffne den Meta Graph API Explorer.</li>
+                <li data-de="Rufe deine Facebook-Seiten und anschließend das Feld „instagram_business_account“ ab." data-en="Request your Facebook Pages, then the “instagram_business_account” field.">Rufe deine Facebook-Seiten und anschließend das Feld „instagram_business_account“ ab.</li>
+                <li data-de="Kopiere die lange Zahl aus dem Feld „id“." data-en="Copy the long number from the “id” field.">Kopiere die lange Zahl aus dem Feld „id“.</li>
+              </ol>
+              <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener" data-de="Graph API Explorer öffnen ↗" data-en="Open Graph API Explorer ↗">Graph API Explorer öffnen ↗</a>
+            </div>
+            <div class="platform-connections">
+              <div class="platform-connect-card" data-platform-connect="tiktok">
+                <div class="connect-head">
+                  <div class="connect-title"><span>🎵</span><span><strong>TikTok verbinden</strong><small data-de="Für automatische Kurzvideo-Posts" data-en="For automatic short-video posts">Für automatische Kurzvideo-Posts</small></span></div>
+                  <span class="connect-state" data-de="EINRICHTUNG NÖTIG" data-en="SETUP NEEDED">EINRICHTUNG NÖTIG</span>
+                </div>
+                <div class="connect-fields">
+                  <div class="connect-field connect-wide"><label data-de="TikTok User Access Token" data-en="TikTok user access token">TikTok User Access Token</label><input type="password" id="tiktok_token" placeholder="act...."></div>
+                  <div class="connect-field"><label>Open ID</label><input type="text" id="tiktok_open_id" placeholder="user_open_id"></div>
+                  <div class="connect-field"><label data-de="Veröffentlichungsmodus" data-en="Publishing mode">Veröffentlichungsmodus</label><select id="tiktok_mode"><option value="direct" data-de="Direkt veröffentlichen" data-en="Direct post">Direkt veröffentlichen</option><option value="inbox" data-de="An TikTok-Inbox senden" data-en="Send to TikTok inbox">An TikTok-Inbox senden</option></select></div>
+                </div>
+                <details class="advanced-connect"><summary data-de="Erweitert: App-Zugang" data-en="Advanced: app credentials">Erweitert: App-Zugang</summary><div class="connect-fields"><div class="connect-field"><label>Client Key</label><input type="text" id="tiktok_client_key"></div><div class="connect-field"><label>Client Secret</label><input type="password" id="tiktok_client_secret"></div></div></details>
+                <div class="connect-note" data-de="Am einfachsten ist eine einmalige Anmeldung über TikTok OAuth. Kein Webhook ist fürs reine Posten nötig. " data-en="The easiest setup is a one-time TikTok OAuth login. A webhook is not required just to publish. ">Am einfachsten ist eine einmalige Anmeldung über TikTok OAuth. Kein Webhook ist fürs reine Posten nötig. </div>
+                <div class="connect-note"><a href="https://developers.tiktok.com/products/content-posting-api/" target="_blank" rel="noopener">TikTok Content Posting API ↗</a></div>
+              </div>
+
+              <div class="platform-connect-card" data-platform-connect="facebook">
+                <div class="connect-head">
+                  <div class="connect-title"><span>👥</span><span><strong>Facebook Page verbinden</strong><small data-de="Posts, Videos und Reels auf einer Seite" data-en="Posts, videos and reels on a Page">Posts, Videos und Reels auf einer Seite</small></span></div>
+                  <span class="connect-state" data-de="EINRICHTUNG NÖTIG" data-en="SETUP NEEDED">EINRICHTUNG NÖTIG</span>
+                </div>
+                <div class="connect-fields">
+                  <div class="connect-field"><label>Facebook Page ID</label><input type="text" id="fb_page_id" placeholder="123456789..."></div>
+                  <div class="connect-field"><label>Page Access Token</label><input type="password" id="fb_page_token" placeholder="EAAB..."></div>
+                </div>
+                <details class="advanced-connect"><summary data-de="Erweitert: Meta App & optionaler Webhook" data-en="Advanced: Meta app and optional webhook">Erweitert: Meta App & optionaler Webhook</summary><div class="connect-fields"><div class="connect-field"><label>Meta App ID</label><input type="text" id="fb_app_id"></div><div class="connect-field"><label>App Secret</label><input type="password" id="fb_app_secret"></div><div class="connect-field connect-wide"><label data-de="Webhook Verify Token (optional)" data-en="Webhook verify token (optional)">Webhook Verify Token (optional)</label><input type="password" id="fb_webhook_token"></div></div></details>
+                <div class="connect-note" data-de="Fürs Posten reichen normalerweise Page ID und Page Access Token. Einen Webhook brauchst du nur, wenn vyrl auf Kommentare oder Ereignisse reagieren soll. " data-en="Page ID and a Page access token are normally enough for publishing. A webhook is only needed if vyrl should react to comments or events. ">Fürs Posten reichen normalerweise Page ID und Page Access Token. Einen Webhook brauchst du nur, wenn vyrl auf Kommentare oder Ereignisse reagieren soll. </div>
+                <div class="connect-note"><a href="https://developers.facebook.com/docs/pages-api/posts/" target="_blank" rel="noopener">Facebook Pages API ↗</a></div>
+              </div>
+
+              <div class="platform-connect-card" data-platform-connect="linkedin">
+                <div class="connect-head">
+                  <div class="connect-title"><span>💼</span><span><strong>LinkedIn verbinden</strong><small data-de="Für Profil- oder Unternehmensposts" data-en="For profile or organization posts">Für Profil- oder Unternehmensposts</small></span></div>
+                  <span class="connect-state" data-de="EINRICHTUNG NÖTIG" data-en="SETUP NEEDED">EINRICHTUNG NÖTIG</span>
+                </div>
+                <div class="connect-fields">
+                  <div class="connect-field connect-wide"><label>LinkedIn Access Token</label><input type="password" id="linkedin_token"></div>
+                  <div class="connect-field"><label data-de="Autor-URN" data-en="Author URN">Autor-URN</label><input type="text" id="linkedin_author" placeholder="urn:li:person:..."></div>
+                  <div class="connect-field"><label data-de="Posten als" data-en="Post as">Posten als</label><select id="linkedin_type"><option value="person" data-de="Persönliches Profil" data-en="Personal profile">Persönliches Profil</option><option value="organization" data-de="Unternehmensseite" data-en="Organization Page">Unternehmensseite</option></select></div>
+                </div>
+                <details class="advanced-connect"><summary data-de="Erweitert: LinkedIn App" data-en="Advanced: LinkedIn app">Erweitert: LinkedIn App</summary><div class="connect-fields"><div class="connect-field"><label>Client ID</label><input type="text" id="linkedin_client_id"></div><div class="connect-field"><label>Client Secret</label><input type="password" id="linkedin_client_secret"></div></div></details>
+                <div class="connect-note"><a href="https://learn.microsoft.com/linkedin/marketing/community-management/shares/posts-api" target="_blank" rel="noopener">LinkedIn Posts API ↗</a></div>
+              </div>
+
+              <div class="platform-connect-card" data-platform-connect="x">
+                <div class="connect-head">
+                  <div class="connect-title"><span>𝕏</span><span><strong>X verbinden</strong><small data-de="Für Posts, Threads und Videos" data-en="For posts, threads and videos">Für Posts, Threads und Videos</small></span></div>
+                  <span class="connect-state" data-de="EINRICHTUNG NÖTIG" data-en="SETUP NEEDED">EINRICHTUNG NÖTIG</span>
+                </div>
+                <div class="connect-fields">
+                  <div class="connect-field connect-wide"><label data-de="OAuth User Access Token" data-en="OAuth user access token">OAuth User Access Token</label><input type="password" id="x_access_token"></div>
+                  <div class="connect-field connect-wide"><label data-de="Benutzer-ID (optional)" data-en="User ID (optional)">Benutzer-ID (optional)</label><input type="text" id="x_user_id"></div>
+                </div>
+                <details class="advanced-connect"><summary data-de="Erweitert: X App" data-en="Advanced: X app">Erweitert: X App</summary><div class="connect-fields"><div class="connect-field"><label>Client ID / API Key</label><input type="text" id="x_client_id"></div><div class="connect-field"><label>Client Secret</label><input type="password" id="x_client_secret"></div></div></details>
+                <div class="connect-note" data-de="Zum Posten muss der Token im Namen des Nutzers erstellt sein und Schreibrechte besitzen. Ein reiner Bearer Token für öffentliche Daten reicht nicht. " data-en="Publishing requires a user-context token with write permission. A read-only app bearer token is not enough. ">Zum Posten muss der Token im Namen des Nutzers erstellt sein und Schreibrechte besitzen. Ein reiner Bearer Token für öffentliche Daten reicht nicht. </div>
+                <div class="connect-note"><a href="https://developer.x.com/en/docs/x-api" target="_blank" rel="noopener">X API ↗</a></div>
+              </div>
+
+              <div class="platform-connect-card" data-platform-connect="youtube">
+                <div class="connect-head">
+                  <div class="connect-title"><span>▶️</span><span><strong>YouTube Shorts verbinden</strong><small data-de="Über den verbundenen YouTube-Kanal" data-en="Through the connected YouTube channel">Über den verbundenen YouTube-Kanal</small></span></div>
+                  <span class="connect-state" data-de="OAUTH NÖTIG" data-en="OAUTH NEEDED">OAUTH NÖTIG</span>
+                </div>
+                <div class="connect-fields"><div class="connect-field"><label>Channel ID</label><input type="text" id="youtube_channel_id"></div><div class="connect-field"><label>Refresh Token</label><input type="password" id="youtube_refresh_token"></div></div>
+                <details class="advanced-connect"><summary data-de="Erweitert: Google OAuth App" data-en="Advanced: Google OAuth app">Erweitert: Google OAuth App</summary><div class="connect-fields"><div class="connect-field"><label>Client ID</label><input type="text" id="youtube_client_id"></div><div class="connect-field"><label>Client Secret</label><input type="password" id="youtube_client_secret"></div></div></details>
+                <div class="connect-note"><a href="https://developers.google.com/youtube/v3/guides/uploading_a_video" target="_blank" rel="noopener">YouTube Upload Guide ↗</a></div>
+              </div>
+
+              <div class="platform-connect-card" data-platform-connect="threads">
+                <div class="connect-head">
+                  <div class="connect-title"><span>🧵</span><span><strong>Threads verbinden</strong><small data-de="Text-, Bild- und Video-Posts" data-en="Text, image and video posts">Text-, Bild- und Video-Posts</small></span></div>
+                  <span class="connect-state" data-de="EINRICHTUNG NÖTIG" data-en="SETUP NEEDED">EINRICHTUNG NÖTIG</span>
+                </div>
+                <div class="connect-fields"><div class="connect-field"><label>Threads User ID</label><input type="text" id="threads_user_id"></div><div class="connect-field"><label>User Access Token</label><input type="password" id="threads_token"></div></div>
+                <details class="advanced-connect"><summary data-de="Erweitert: Meta App" data-en="Advanced: Meta app">Erweitert: Meta App</summary><div class="connect-fields"><div class="connect-field"><label>App ID</label><input type="text" id="threads_app_id"></div><div class="connect-field"><label>App Secret</label><input type="password" id="threads_app_secret"></div></div></details>
+                <div class="connect-note"><a href="https://developers.facebook.com/docs/threads/" target="_blank" rel="noopener">Threads API ↗</a></div>
+              </div>
+            </div>
+          </div>
+          <div class="safety-strip">
+            <span>🛟</span>
+            <span data-de="<strong>Wichtig:</strong> Teile Keys und Tokens niemals per Screenshot, E-Mail oder Chat. In einer echten öffentlichen Version werden diese Zugänge sicher auf dem Server gespeichert – nicht im Browser." data-en="<strong>Important:</strong> Never share keys or tokens in screenshots, email or chat. In a real public version, credentials are securely stored on the server – not in the browser."><strong>Wichtig:</strong> Teile Keys und Tokens niemals per Screenshot, E-Mail oder Chat. In einer echten öffentlichen Version werden diese Zugänge sicher auf dem Server gespeichert – nicht im Browser.</span>
+          </div>
+          <div class="key-note">
+            <span data-de="🔒 Deine Keys werden nicht im Tagesplan gespeichert. Für die Produktion gehören sie sicher in Server-Umgebungsvariablen – niemals öffentlich in die HTML-Datei." data-en="🔒 Your keys are not saved in the daily schedule. In production, keep them in secure server environment variables – never expose them in the HTML file.">🔒 Deine Keys werden nicht im Tagesplan gespeichert. Für die Produktion gehören sie sicher in Server-Umgebungsvariablen – niemals öffentlich in die HTML-Datei.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+      </div>
+    </details>
+
+    <div style="display:flex;gap:10px;">
+      <button class="btn-restart" style="flex:0 0 auto;width:auto;padding:14px 20px;" onclick="goToStep1()" data-de="← Zurück" data-en="← Back">← Zurück</button>
+      <button class="btn-cta" onclick="startRun()" style="flex:1;">
+        <span data-de="✨ Content jetzt erstellen" data-en="✨ Create content now">✨ Content jetzt erstellen</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: GENERIEREN ── -->
+  <div id="step3" class="hidden">
+    <div class="log-card">
+      <div class="log-header">
+        <div class="log-dot"></div>
+        <div class="log-title">vyrl generiert deinen Reel...</div>
+      </div>
+      <div class="log-body" id="runlog"></div>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: ERGEBNISSE + GATE ── -->
+  <div id="step4" class="hidden">
+
+    <!-- Viral Score -->
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <span style="font-size:18px;">📊</span>
+        <span style="font-size:15px;font-weight:700;">Viral Score</span>
+        <span id="score-tip" style="font-size:12px;color:var(--gray-400);margin-left:4px;"></span>
+      </div>
+      <div class="score-grid">
+        <div class="score-item">
+          <div class="score-val" id="sc_h" style="color:#EF4444;">—</div>
+          <div class="score-bar"><div class="score-fill" id="sb_h" style="width:0%;background:#EF4444;"></div></div>
+          <div class="score-lbl">Hook</div>
+        </div>
+        <div class="score-item">
+          <div class="score-val" id="sc_r" style="color:#F59E0B;">—</div>
+          <div class="score-bar"><div class="score-fill" id="sb_r" style="width:0%;background:#F59E0B;"></div></div>
+          <div class="score-lbl">Retention</div>
+        </div>
+        <div class="score-item">
+          <div class="score-val" id="sc_s" style="color:#10B981;">—</div>
+          <div class="score-bar"><div class="score-fill" id="sb_s" style="width:0%;background:#10B981;"></div></div>
+          <div class="score-lbl">Share</div>
+        </div>
+        <div class="score-item">
+          <div class="score-val" id="sc_t" style="color:#7C3AED;">—</div>
+          <div class="score-bar"><div class="score-fill" id="sb_t" style="width:0%;background:#7C3AED;"></div></div>
+          <div class="score-lbl">Gesamt</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trend Signal -->
+    <div class="result-block">
+      <div class="result-label">🔍 Trend-Analyse</div>
+      <div class="result-text" id="r_trend"></div>
+    </div>
+
+    <div class="result-block hidden" id="sources-block">
+      <div class="result-label">🌐 Verwendete Quellen</div>
+      <div class="result-text" id="r_sources"></div>
+    </div>
+
+    <!-- Script -->
+    <div class="result-block">
+      <div class="result-label">🎬 Reel Script — <span id="r_dur"></span>s · <span id="r_hook_lbl"></span></div>
+      <button class="copy-btn" onclick="copyRes('r_script',this)">Kopieren</button>
+      <div class="result-text" id="r_script"></div>
+    </div>
+
+    <!-- Caption -->
+    <div class="result-block">
+      <div class="result-label">📝 Instagram Caption + Hashtags</div>
+      <button class="copy-btn" onclick="copyRes('r_caption',this)">Kopieren</button>
+      <div class="result-text" id="r_caption"></div>
+    </div>
+
+    <!-- Timing -->
+    <div class="result-block">
+      <div class="result-label">⏰ Bester Posting-Zeitpunkt</div>
+      <div class="result-text" id="r_timing"></div>
+    </div>
+
+    <!-- Video -->
+    <div class="result-block" id="video-block">
+      <div class="result-label">🎥 KI-Video (OpenRouter Auto-Routing)</div>
+      <div class="result-text" id="r_vid">Wird generiert...</div>
+      <div id="vid_url_box" class="hidden">
+        <div class="video-url-box"><a id="vid_url" href="#" target="_blank">Download Video</a></div>
+      </div>
+    </div>
+
+    <!-- GREEN LIGHT GATE -->
+    <div class="gate-card" id="gate-card">
+      <div class="gate-header">
+        <span class="gate-icon">🚦</span>
+        <span class="gate-title">Schnell-Check vor dem Posten</span>
+      </div>
+      <p class="gate-sub">Hak kurz ab was passt — dann wird gepostet. Dauert 10 Sekunden.</p>
+
+      <div class="check-grid">
+        <div class="check-item" id="c0" onclick="ck(0)"><div class="chk">✓</div>Hook ist stark</div>
+        <div class="check-item" id="c1" onclick="ck(1)"><div class="chk">✓</div>Alles stimmt inhaltlich</div>
+        <div class="check-item" id="c2" onclick="ck(2)"><div class="chk">✓</div>Kein falscher Claim</div>
+        <div class="check-item" id="c3" onclick="ck(3)"><div class="chk">✓</div>Hashtags passen</div>
+        <div class="check-item" id="c4" onclick="ck(4)"><div class="chk">✓</div>Video sieht gut aus</div>
+        <div class="check-item" id="c5" onclick="ck(5)"><div class="chk">✓</div>DSGVO-konform</div>
+      </div>
+
+      <div class="gate-actions">
+        <button class="btn-reject" onclick="rejectContent()">✗ Überarbeiten</button>
+        <button class="btn-approve" id="btn-approve" onclick="approve()" disabled>
+          ✓ Freigeben & weiter
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── STEP 5: POSTING ── -->
+  <div id="step5" class="hidden">
+    <div class="card">
+      <div class="card-icon">📱</div>
+      <h2 data-de="Bereit zum Veröffentlichen" data-en="Ready to publish">Bereit zum Veröffentlichen</h2>
+      <p class="sub" data-de="Prüfe die fertige Video-URL und starte anschließend das Posting." data-en="Check the finished video URL, then start publishing.">Prüfe die fertige Video-URL und starte anschließend das Posting.</p>
+      <div class="connection-intro" id="publish-mode-note">
+        <strong data-de="Lokale Datei oder Online-Version?" data-en="Local file or online version?">Lokale Datei oder Online-Version?</strong><br>
+        <span data-de="Bei einer lokalen file://-Datei funktioniert nur die manuelle Token-Methode. Ein-Klick-Login und zuverlässiges automatisches Posten benötigen die online veröffentlichte Version mit Backend." data-en="When opened as a local file:// page, only manual token entry can work. One-click login and reliable automatic publishing require the deployed online version with a backend.">Bei einer lokalen file://-Datei funktioniert nur die manuelle Token-Methode. Ein-Klick-Login und zuverlässiges automatisches Posten benötigen die online veröffentlichte Version mit Backend.</span>
+      </div>
+
+      <div class="result-block" style="margin-bottom:14px;">
+        <div class="result-label">Video URL</div>
+        <input type="url" class="text-input" id="post-url" placeholder="https://.../fertiges-video.mp4" style="margin-top:4px;">
+        <div class="video-url-warning" id="video-url-warning"></div>
+      </div>
+
+      <div class="publish-check">
+        <div class="publish-check-title">
+          <strong data-de="Instagram-Verbindung" data-en="Instagram connection">Instagram-Verbindung</strong>
+          <span class="publish-state" id="publish-connection-state" data-de="PRÜFEN" data-en="CHECK">PRÜFEN</span>
+        </div>
+        <div class="publish-credentials">
+          <div>
+            <label data-de="Instagram Token" data-en="Instagram token">Instagram Token</label>
+            <input type="password" id="publish-ig-token" placeholder="EAAB...">
+          </div>
+          <div>
+            <label data-de="Instagram Account-ID" data-en="Instagram account ID">Instagram Account-ID</label>
+            <input type="text" id="publish-ig-account" placeholder="17841...">
+          </div>
+        </div>
+        <div class="key-note" data-de="Die Werte werden aus deinen Einstellungen übernommen. Du kannst sie hier direkt korrigieren." data-en="Values are copied from your settings. You can correct them here directly.">Die Werte werden aus deinen Einstellungen übernommen. Du kannst sie hier direkt korrigieren.</div>
+        <div class="publish-error" id="publish-error"></div>
+      </div>
+
+      <button class="btn-cta" id="btn-post" onclick="doPost()">
+        📲 Jetzt auf Instagram posten
+      </button>
+      <div class="log-card hidden" id="postlog-card" style="margin-top:14px;">
+        <div class="log-header"><div class="log-dot"></div><div class="log-title">Publishing...</div></div>
+        <div class="log-body" id="postlog"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROOF ── -->
+  <div id="proof-section" class="hidden">
+    <div class="proof-card">
+      <div class="proof-check">🎉</div>
+      <div class="proof-title">Reel ist live!</div>
+      <div class="proof-sub">Dein Reel wurde erfolgreich auf Instagram gepostet.</div>
+      <div class="proof-url"><a id="proof-url" href="#" target="_blank">Instagram öffnen →</a></div>
+      <div class="run-meta" id="run-meta"></div>
+    </div>
+    <button class="btn-restart" onclick="location.reload()">🔄 Neuen Reel erstellen</button>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><span class="v">v</span><span class="yrl">yrl</span></div>
+  <div class="footer-links">
+    <a onclick="openModal('impressum')">Impressum</a>
+    <a onclick="openModal('datenschutz')">Datenschutz</a>
+    <a onclick="openModal('agb')">AGB</a>
+    <a href="mailto:mail.ai.nexora@gmail.com">Kontakt</a>
+  </div>
+  <div class="footer-copy">© 2026 NEXORA AI · Made with 💜 in Germany</div>
+</footer>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-impressum">
+  <div class="modal">
+    <h3>Impressum</h3>
+    <p><strong>Angaben gemäß § 5 TMG</strong></p>
+    <p>NEXORA AI<br>Mike Kosthorst & Diana Ponomarew GbR<br>Waiblingen, Deutschland</p>
+    <p><strong>Kontakt</strong><br>E-Mail: mail.ai.nexora@gmail.com<br>Website: nexora-ai-solutions.netlify.app</p>
+    <p><strong>Hinweis</strong><br>Diese Website befindet sich im Beta-Betrieb. Es handelt sich um ein Studienprojekt im Rahmen des Studiengangs Applied AI an der Hochschule Ansbach (SoSe 2026).</p>
+    <p><strong>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</strong><br>Mike Kosthorst, Waiblingen</p>
+    <button class="modal-close" onclick="closeModal('modal-impressum')">Schließen</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-datenschutz">
+  <div class="modal">
+    <h3>Datenschutzerklärung</h3>
+    <p><strong>Verantwortlicher</strong><br>NEXORA AI, Mike Kosthorst, Waiblingen</p>
+    <p><strong>Datenverarbeitung</strong><br>vyrl speichert keine persönlichen Daten auf Servern. API Keys werden ausschließlich lokal in deinem Browser verarbeitet und nicht übertragen oder gespeichert.</p>
+    <p><strong>API-Aufrufe</strong><br>Bei der Nutzung von vyrl werden Anfragen an die Anthropic API (claude.ai), die Creatomate API und die Meta Graph API gesendet. Dabei gelten die jeweiligen Datenschutzbestimmungen der Anbieter.</p>
+    <p><strong>Hosting</strong><br>Diese Website wird über Netlify gehostet. Es gelten die Datenschutzbestimmungen von Netlify (netlify.com/privacy).</p>
+    <p><strong>Cookies</strong><br>vyrl verwendet keine Tracking-Cookies oder Analytics-Tools.</p>
+    <p><strong>Rechte</strong><br>Du hast das Recht auf Auskunft, Berichtigung und Löschung deiner Daten. Kontakt: mail.ai.nexora@gmail.com</p>
+    <button class="modal-close" onclick="closeModal('modal-datenschutz')">Schließen</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-agb">
+  <div class="modal">
+    <h3>Nutzungsbedingungen</h3>
+    <p><strong>Beta-Version</strong><br>vyrl befindet sich im Beta-Betrieb. Die Nutzung erfolgt auf eigene Verantwortung. NEXORA AI übernimmt keine Haftung für durch vyrl generierte Inhalte.</p>
+    <p><strong>Inhalte</strong><br>Du bist für alle generierten und veröffentlichten Inhalte selbst verantwortlich. Die Nutzung für illegale, irreführende oder schädigende Inhalte ist untersagt.</p>
+    <p><strong>Instagram / Meta</strong><br>Die Nutzung der Meta Graph API unterliegt den Nutzungsbedingungen von Meta Platforms, Inc. Du bist für die Einhaltung der Instagram-Richtlinien verantwortlich.</p>
+    <p><strong>KI-generierte Inhalte</strong><br>Generierte Scripts und Captions sind KI-Vorschläge. Überprüfe alle Inhalte vor der Veröffentlichung. vyrl kennzeichnet generierte Inhalte nicht automatisch als KI-Inhalt — dies liegt in deiner Verantwortung.</p>
+    <button class="modal-close" onclick="closeModal('modal-agb')">Schließen</button>
+  </div>
+</div>
+
+<script>
+// STATE
+let selTopic = 'Schnelle gesunde Rezepte für den Alltag';
+let selTCtx = 'Praktische Rezepte, die einfach nachzumachen sind';
+let selHookType = 'PROVOCATION';
+let selHookCtx = 'Statement das sofort Stop-the-Scroll erzwingt';
+let captionText = '';
+let videoUrl = '';
+let igToken = '';
+let igAccountId = '';
+let aiProvider = localStorage.getItem('vyrl_ai_provider') || 'claude';
+let selectedChannels = JSON.parse(localStorage.getItem('vyrl_channels') || '["instagram"]');
+let qualityMode = localStorage.getItem('vyrl_quality_mode') || 'balanced';
+let contentStrategyContext = localStorage.getItem('vyrl_content_strategy') || '';
+let currentLanguage = localStorage.getItem('vyrl_language') || 'de';
+let scheduleRunning = false;
+const checks = [false,false,false,false,false,false];
+
+function hasNetlifyBackend() {
+  return location.protocol === 'https:' || location.hostname.endsWith('.netlify.app');
+}
+
+// LANGUAGE
+function setLanguage(lang) {
+  currentLanguage = lang;
+  localStorage.setItem('vyrl_language', lang);
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-de][data-en]').forEach(el => {
+    el.innerHTML = el.getAttribute('data-'+lang);
+  });
+  document.querySelectorAll('[data-placeholder-de][data-placeholder-en]').forEach(el => {
+    el.placeholder = el.getAttribute('data-placeholder-'+lang);
+  });
+  document.getElementById('lang-de').classList.toggle('active', lang === 'de');
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  renderChannels();
+  renderSchedule();
+}
+
+// DAILY SCHEDULER
+function getSchedule() {
+  try { return JSON.parse(localStorage.getItem('vyrl_daily_schedule') || 'null'); }
+  catch (_) { return null; }
+}
+
+function saveSchedule() {
+  const custom = document.getElementById('custom-topic').value.trim();
+  if (custom) { selTopic = custom; selTCtx = 'Freely selected user topic'; }
+  const time = document.getElementById('schedule-time').value;
+  if (!time) {
+    alert(currentLanguage === 'de' ? 'Bitte wähle eine Uhrzeit.' : 'Please choose a time.');
+    return;
+  }
+  const schedule = {
+    enabled: true,
+    time,
+    zone: document.getElementById('schedule-zone').value,
+    autoPublish: document.getElementById('auto-publish').checked,
+    topic: selTopic,
+    topicContext: selTCtx,
+    hookType: selHookType,
+    hookContext: selHookCtx,
+    duration: document.getElementById('dur').value,
+    format: document.getElementById('fmt').value,
+    cta: document.getElementById('cta').value,
+    channels: selectedChannels,
+    audience: document.getElementById('audience').value,
+    contentGoal: document.getElementById('content_goal').value,
+    expertise: document.getElementById('expertise').value,
+    voice: document.getElementById('voice').value,
+    mustInclude: document.getElementById('must_include').value,
+    avoidContent: document.getElementById('avoid_content').value,
+    qualityMode,
+    webResearch: document.getElementById('web_research').checked,
+    nicheDescription: document.getElementById('niche_description').value,
+    offerDescription: document.getElementById('offer_description').value,
+    uniqueAngle: document.getElementById('unique_angle').value,
+    ownLinks: document.getElementById('own_links').value,
+    referenceLinks: document.getElementById('reference_links').value,
+    contentStrategyContext,
+    lastRunKey: getSchedule()?.lastRunKey || ''
+  };
+  localStorage.setItem('vyrl_daily_schedule', JSON.stringify(schedule));
+  if (hasNetlifyBackend()) {
+    fetch('/api/schedule', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({...schedule, language: currentLanguage})
+    }).catch(() => {});
+  }
+  renderSchedule();
+}
+
+function stopSchedule() {
+  const schedule = getSchedule();
+  if (schedule) {
+    schedule.enabled = false;
+    localStorage.setItem('vyrl_daily_schedule', JSON.stringify(schedule));
+  }
+  renderSchedule();
+}
+
+function zonedNow(zone) {
+  if (zone === 'local') {
+    const d = new Date();
+    return {
+      date: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,
+      time: `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+    };
+  }
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+  }).formatToParts(new Date()).reduce((a,p) => (a[p.type]=p.value,a), {});
+  return { date: `${parts.year}-${parts.month}-${parts.day}`, time: `${parts.hour}:${parts.minute}` };
+}
+
+function renderSchedule(message = '') {
+  const schedule = getSchedule();
+  const pill = document.getElementById('schedule-status');
+  const summary = document.getElementById('schedule-summary');
+  if (!pill || !summary) return;
+  if (!schedule?.enabled) {
+    pill.classList.remove('on');
+    pill.textContent = currentLanguage === 'de' ? 'NICHT AKTIV' : 'NOT ACTIVE';
+    summary.innerHTML = currentLanguage === 'de'
+      ? '<strong>Noch kein Tagesplan aktiv.</strong> Wähle eine Uhrzeit und aktiviere den Autopilot.'
+      : '<strong>No daily schedule is active yet.</strong> Choose a time and activate the autopilot.';
+    return;
+  }
+  pill.classList.add('on');
+  pill.textContent = currentLanguage === 'de' ? 'AKTIV' : 'ACTIVE';
+  document.getElementById('schedule-time').value = schedule.time;
+  document.getElementById('schedule-zone').value = schedule.zone;
+  document.getElementById('auto-publish').checked = schedule.autoPublish;
+  const zoneLabel = schedule.zone === 'local'
+    ? (currentLanguage === 'de' ? 'lokaler Zeit' : 'local time')
+    : schedule.zone;
+  summary.innerHTML = currentLanguage === 'de'
+    ? `<strong>Täglich um ${schedule.time} Uhr</strong> (${zoneLabel})<br>Thema: ${escapeHtml(schedule.topic)}${message ? '<br>'+escapeHtml(message) : ''}`
+    : `<strong>Every day at ${schedule.time}</strong> (${zoneLabel})<br>Topic: ${escapeHtml(schedule.topic)}${message ? '<br>'+escapeHtml(message) : ''}`;
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+
+function applyScheduledSettings(schedule) {
+  selTopic = schedule.topic;
+  selTCtx = schedule.topicContext;
+  selHookType = schedule.hookType;
+  selHookCtx = schedule.hookContext;
+  document.getElementById('dur').value = schedule.duration;
+  document.getElementById('fmt').value = schedule.format;
+  document.getElementById('cta').value = schedule.cta;
+  document.getElementById('audience').value = schedule.audience || '';
+  document.getElementById('content_goal').value = schedule.contentGoal || 'teach';
+  document.getElementById('expertise').value = schedule.expertise || 'intermediate';
+  document.getElementById('voice').value = schedule.voice || 'direct';
+  document.getElementById('must_include').value = schedule.mustInclude || '';
+  document.getElementById('avoid_content').value = schedule.avoidContent || '';
+  document.getElementById('web_research').checked = schedule.webResearch !== false;
+  document.getElementById('niche_description').value = schedule.nicheDescription || '';
+  document.getElementById('offer_description').value = schedule.offerDescription || '';
+  document.getElementById('unique_angle').value = schedule.uniqueAngle || '';
+  document.getElementById('own_links').value = schedule.ownLinks || '';
+  document.getElementById('reference_links').value = schedule.referenceLinks || '';
+  if (schedule.contentStrategyContext) {
+    contentStrategyContext = schedule.contentStrategyContext;
+    localStorage.setItem('vyrl_content_strategy', contentStrategyContext);
+  }
+  if (schedule.qualityMode) {
+    qualityMode = schedule.qualityMode;
+    document.querySelectorAll('.quality-option').forEach(btn => btn.classList.toggle('active', btn.dataset.quality === qualityMode));
+  }
+  if (schedule.channels?.length) {
+    selectedChannels = schedule.channels;
+    renderChannels();
+  }
+}
+
+async function schedulerTick() {
+  const schedule = getSchedule();
+  if (!schedule?.enabled || scheduleRunning) return;
+  const now = zonedNow(schedule.zone);
+  if (now.time !== schedule.time || schedule.lastRunKey === now.date) return;
+
+  schedule.lastRunKey = now.date;
+  localStorage.setItem('vyrl_daily_schedule', JSON.stringify(schedule));
+  applyScheduledSettings(schedule);
+  scheduleRunning = true;
+  renderSchedule(currentLanguage === 'de' ? 'Automatischer Lauf wurde gestartet …' : 'Automatic run started …');
+  try {
+    await startRun({ autoPublish: schedule.autoPublish, scheduled: true });
+  } finally {
+    scheduleRunning = false;
+  }
+}
+
+setInterval(schedulerTick, 15000);
+window.addEventListener('load', () => {
+  processOAuthCallback();
+  configureDeploymentMode();
+  setLanguage(currentLanguage);
+  selectAIProvider(aiProvider);
+  document.querySelectorAll('.quality-option').forEach(btn => btn.classList.toggle('active', btn.dataset.quality === qualityMode));
+  renderChannels();
+  refreshBackendConnections();
+  renderSchedule();
+  document.getElementById('custom-topic')?.addEventListener('input', function() {
+    if (this.value.trim()) document.querySelectorAll('.trend-card').forEach(c => c.classList.remove('sel'));
+  });
+  document.querySelectorAll('.platform-connect-card input, .platform-connect-card select').forEach(field => {
+    field.addEventListener('input', updateConnectionStates);
+    field.addEventListener('change', updateConnectionStates);
+  });
+  const igTokenField = document.getElementById('ig_tok');
+  const igAccountField = document.getElementById('ig_acc');
+  if (igTokenField) {
+    igTokenField.value = sessionStorage.getItem('vyrl_session_ig_token') || igTokenField.value;
+    igTokenField.addEventListener('input', () => sessionStorage.setItem('vyrl_session_ig_token', igTokenField.value.trim()));
+  }
+  if (igAccountField) {
+    igAccountField.value = sessionStorage.getItem('vyrl_session_ig_account') || igAccountField.value;
+    igAccountField.addEventListener('input', () => sessionStorage.setItem('vyrl_session_ig_account', igAccountField.value.trim()));
+  }
+  ['publish-ig-token','publish-ig-account','post-url'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', validatePublishForm);
+  });
+  schedulerTick();
+});
+
+function configureDeploymentMode() {
+  if (!hasNetlifyBackend()) return;
+  document.querySelectorAll('#provider-claude, #provider-openrouter, [data-provider="claude"], #help-ai, #help-openrouter')
+    .forEach(element => element?.classList.add('hidden'));
+  const intro = document.querySelector('.connection-intro');
+  if (intro) {
+    intro.innerHTML = currentLanguage === 'de'
+      ? '<strong>✅ Sichere Online-Version aktiv</strong><br>OpenRouter-Keys und Social-Tokens werden serverseitig verwaltet. Du musst hier keine geheimen Schlüssel einfügen.'
+      : '<strong>✅ Secure online version active</strong><br>OpenRouter keys and social tokens are managed on the server. You do not need to enter secret keys here.';
+  }
+}
+
+async function refreshBackendConnections() {
+  if (!hasNetlifyBackend()) return;
+  try {
+    const response = await fetch('/api/connections');
+    const connections = await response.json();
+    localStorage.setItem('vyrl_oauth_connections', JSON.stringify(connections || {}));
+    renderOAuthHub();
+  } catch (_) {}
+}
+
+function selectQuality(button) {
+  qualityMode = button.getAttribute('data-quality');
+  localStorage.setItem('vyrl_quality_mode', qualityMode);
+  document.querySelectorAll('.quality-option').forEach(btn => btn.classList.toggle('active', btn === button));
+}
+
+// NAV
+function openModal(id) { document.getElementById('modal-'+id).classList.add('open'); }
+function closeModal(id) { document.getElementById('modal-'+id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); }));
+
+// COLLAPSE
+function toggleCollapse(contentId, btnId) {
+  const c = document.getElementById(contentId);
+  const b = document.getElementById(btnId);
+  c.classList.toggle('open');
+  b.classList.toggle('open');
+}
+
+function toggleKeyHelp(id, button) {
+  const target = document.getElementById(id);
+  const willOpen = !target.classList.contains('open');
+  document.querySelectorAll('.key-help').forEach(help => help.classList.remove('open'));
+  document.querySelectorAll('.help-toggle').forEach(btn => {
+    btn.textContent = '?';
+    btn.setAttribute('aria-expanded', 'false');
+  });
+  if (willOpen) {
+    target.classList.add('open');
+    button.textContent = '×';
+    button.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function selectAIProvider(provider) {
+  aiProvider = provider;
+  localStorage.setItem('vyrl_ai_provider', provider);
+  document.querySelectorAll('.provider-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('provider-'+provider)?.classList.add('active');
+  document.querySelectorAll('.provider-field').forEach(field => {
+    field.classList.toggle('hidden-provider', field.getAttribute('data-provider') !== provider);
+  });
+  document.querySelectorAll('.key-help').forEach(help => help.classList.remove('open'));
+  document.querySelectorAll('.help-toggle').forEach(btn => {
+    btn.textContent = '?';
+    btn.setAttribute('aria-expanded', 'false');
+  });
+}
+
+function toggleMoreChannels() {
+  const box = document.getElementById('channel-more');
+  const open = box.classList.toggle('open');
+  const btn = document.getElementById('more-channels-btn');
+  btn.textContent = currentLanguage === 'de'
+    ? (open ? '− Weniger Plattformen anzeigen' : '+ Mehr Plattformen anzeigen')
+    : (open ? '− Show fewer platforms' : '+ Show more platforms');
+}
+
+function oauthGroupsForChannels() {
+  const groups = [];
+  if (selectedChannels.some(channel => ['instagram','facebook','threads'].includes(channel))) {
+    groups.push({id:'meta',icon:'∞',name:'Meta',detail:'Instagram · Facebook · Threads'});
+  }
+  if (selectedChannels.includes('tiktok')) groups.push({id:'tiktok',icon:'🎵',name:'TikTok',detail:'Login Kit + Content Posting'});
+  if (selectedChannels.includes('linkedin')) groups.push({id:'linkedin',icon:'💼',name:'LinkedIn',detail:'Profil oder Unternehmensseite'});
+  if (selectedChannels.includes('youtube')) groups.push({id:'google',icon:'▶️',name:'Google / YouTube',detail:'YouTube-Kanal'});
+  if (selectedChannels.includes('x')) groups.push({id:'x',icon:'𝕏',name:'X',detail:'Posts, Threads und Video'});
+  return groups;
+}
+
+function oauthConnections() {
+  try { return JSON.parse(localStorage.getItem('vyrl_oauth_connections') || '{}'); }
+  catch (_) { return {}; }
+}
+
+function renderOAuthHub() {
+  const list = document.getElementById('oauth-list');
+  if (!list) return;
+  const connections = oauthConnections();
+  const groups = oauthGroupsForChannels();
+  list.innerHTML = groups.map(group => {
+    const connected = connections[group.id];
+    const detail = currentLanguage === 'de' ? group.detail : ({
+      meta:'Instagram · Facebook · Threads',
+      tiktok:'Login Kit + Content Posting',
+      linkedin:'Profile or organization Page',
+      google:'YouTube channel',
+      x:'Posts, threads and video'
+    }[group.id] || group.detail);
+    return `<div class="oauth-row">
+      <div class="oauth-brand"><span>${group.icon}</span><span><strong>${group.name}</strong><small>${escapeHtml(connected?.account || detail)}</small></span></div>
+      <button class="oauth-action${connected ? ' connected' : ''}" type="button" onclick="${connected ? `showConnectedAccount('${group.id}')` : `startSocialConnect('${group.id}')`}">${connected ? (currentLanguage === 'de' ? '✓ Verbunden' : '✓ Connected') : (currentLanguage === 'de' ? 'Verbinden' : 'Connect')}</button>
+    </div>`;
+  }).join('') || `<div class="oauth-note">${currentLanguage === 'de' ? 'Wähle oben mindestens einen Posting-Kanal aus.' : 'Select at least one publishing channel above.'}</div>`;
+}
+
+function startSocialConnect(provider) {
+  const isLocal = ['file:','http:'].includes(location.protocol) && ['','localhost','127.0.0.1'].includes(location.hostname);
+  if (isLocal) {
+    alert(currentLanguage === 'de'
+      ? `Der „Mit ${provider === 'meta' ? 'Meta' : provider} verbinden“-Button ist vorbereitet. Für den echten Login muss die Website online laufen und der sichere OAuth-Endpunkt /api/oauth/${provider}/start eingerichtet sein. Bis dahin kannst du unten die manuelle Einrichtung verwenden.`
+      : `The ${provider} connect button is ready. Real sign-in requires the site to run online with the secure /api/oauth/${provider}/start endpoint. You can use manual setup below until then.`);
+    toggleManualConnect(true);
+    return;
+  }
+  const returnTo = location.origin + location.pathname;
+  location.href = `/api/oauth/${encodeURIComponent(provider)}/start?return_to=${encodeURIComponent(returnTo)}`;
+}
+
+function showConnectedAccount(provider) {
+  const connection = oauthConnections()[provider];
+  alert(currentLanguage === 'de'
+    ? `${connection?.account || provider} ist verbunden. Zugangsdaten werden sicher auf dem Server verwaltet.`
+    : `${connection?.account || provider} is connected. Credentials are securely managed on the server.`);
+}
+
+function toggleManualConnect(forceOpen = false) {
+  const open = forceOpen || document.body.classList.contains('easy-connect');
+  document.body.classList.toggle('easy-connect', !open);
+  document.body.classList.toggle('manual-connect', open);
+  const btn = document.getElementById('manual-connect-btn');
+  if (btn) btn.textContent = currentLanguage === 'de'
+    ? (open ? 'Technische Einrichtung ausblenden' : 'Technische Einrichtung manuell anzeigen')
+    : (open ? 'Hide manual technical setup' : 'Show manual technical setup');
+  updatePlatformConnections();
+}
+
+function processOAuthCallback() {
+  const params = new URLSearchParams(location.search);
+  const connected = params.get('oauth_connected');
+  if (!connected) return;
+  const connections = oauthConnections();
+  connections[connected] = {
+    account: params.get('account_name') || (currentLanguage === 'de' ? 'Konto verbunden' : 'Account connected'),
+    connectedAt: new Date().toISOString()
+  };
+  localStorage.setItem('vyrl_oauth_connections', JSON.stringify(connections));
+  params.delete('oauth_connected');
+  params.delete('account_name');
+  const query = params.toString();
+  history.replaceState({}, '', location.pathname + (query ? '?'+query : '') + location.hash);
+}
+
+function toggleChannel(button) {
+  const channel = button.getAttribute('data-channel');
+  if (selectedChannels.includes(channel)) {
+    if (selectedChannels.length === 1) return;
+    selectedChannels = selectedChannels.filter(item => item !== channel);
+  } else {
+    selectedChannels.push(channel);
+  }
+  localStorage.setItem('vyrl_channels', JSON.stringify(selectedChannels));
+  renderChannels(channel);
+}
+
+function renderChannels(lastChanged = '') {
+  document.querySelectorAll('.channel-btn').forEach(btn => {
+    btn.classList.toggle('selected', selectedChannels.includes(btn.getAttribute('data-channel')));
+  });
+  const names = {
+    instagram:'Instagram', tiktok:'TikTok', linkedin:'LinkedIn',
+    facebook:'Facebook', x:'X', youtube:'YouTube Shorts', threads:'Threads'
+  };
+  const summary = document.getElementById('channel-summary');
+  if (summary) summary.innerHTML = (currentLanguage === 'de' ? '<strong>Ausgewählt:</strong> ' : '<strong>Selected:</strong> ') +
+    selectedChannels.map(item => names[item]).join(', ');
+  updatePlatformConnections();
+  renderOAuthHub();
+
+  const help = document.getElementById('channel-help');
+  if (!help || !lastChanged || lastChanged === 'instagram') {
+    if (help) help.classList.remove('open');
+    return;
+  }
+  const setupLinks = {
+    tiktok:'https://developers.tiktok.com/products/content-posting-api/',
+    linkedin:'https://learn.microsoft.com/linkedin/marketing/community-management/shares/posts-api',
+    facebook:'https://developers.facebook.com/docs/pages-api/posts/',
+    x:'https://developer.x.com/en/docs/x-api',
+    youtube:'https://developers.google.com/youtube/v3/guides/uploading_a_video',
+    threads:'https://developers.facebook.com/docs/threads/'
+  };
+  help.classList.add('open');
+  help.innerHTML = currentLanguage === 'de'
+    ? `<strong>${names[lastChanged]} ausgewählt.</strong><br>Für echtes automatisches Posten muss einmal die offizielle ${names[lastChanged]}-Verbindung eingerichtet werden. In dieser HTML-Demo ist aktuell nur Instagram direkt verdrahtet.<br><a href="${setupLinks[lastChanged]}" target="_blank" rel="noopener">Offizielle Einrichtung ansehen ↗</a>`
+    : `<strong>${names[lastChanged]} selected.</strong><br>Automatic publishing requires a one-time official ${names[lastChanged]} connection. This HTML demo currently has direct publishing wired only for Instagram.<br><a href="${setupLinks[lastChanged]}" target="_blank" rel="noopener">View official setup ↗</a>`;
+}
+
+function updatePlatformConnections() {
+  document.querySelectorAll('[data-platform-connect]').forEach(card => {
+    card.classList.toggle('active', selectedChannels.includes(card.getAttribute('data-platform-connect')));
+  });
+  document.querySelectorAll('[data-channel-credential]').forEach(field => {
+    field.classList.toggle('hidden-channel', !selectedChannels.includes(field.getAttribute('data-channel-credential')));
+  });
+  const names = {instagram:'Instagram',tiktok:'TikTok',linkedin:'LinkedIn',facebook:'Facebook',x:'X',youtube:'YouTube',threads:'Threads'};
+  const label = selectedChannels.map(channel => names[channel]).join(', ');
+  const toggle = document.getElementById('api-toggle');
+  if (toggle) {
+    const arrow = toggle.querySelector('.arrow')?.outerHTML || '<span class="arrow">▶</span>';
+    toggle.innerHTML = `${arrow} <span>${currentLanguage === 'de' ? 'Verbindungen einrichten' : 'Set up connections'} · ${escapeHtml(label)}</span>`;
+  }
+  updateConnectionStates();
+}
+
+function updateConnectionStates() {
+  const required = {
+    tiktok:['tiktok_token','tiktok_open_id'],
+    facebook:['fb_page_id','fb_page_token'],
+    linkedin:['linkedin_token','linkedin_author'],
+    x:['x_access_token'],
+    youtube:['youtube_channel_id','youtube_refresh_token'],
+    threads:['threads_user_id','threads_token']
+  };
+  Object.entries(required).forEach(([platform, ids]) => {
+    const card = document.querySelector(`[data-platform-connect="${platform}"]`);
+    const state = card?.querySelector('.connect-state');
+    if (!state) return;
+    const complete = ids.every(id => document.getElementById(id)?.value.trim());
+    state.textContent = complete
+      ? (currentLanguage === 'de' ? 'FELDER AUSGEFÜLLT' : 'FIELDS COMPLETE')
+      : (currentLanguage === 'de' ? 'EINRICHTUNG NÖTIG' : 'SETUP NEEDED');
+    state.style.background = complete ? '#D1FAE5' : '#FFF3CD';
+    state.style.color = complete ? '#047857' : '#876600';
+  });
+}
+
+// STEP NAVIGATION
+function setStep(n) {
+  for(let i=0;i<5;i++){
+    const sd = document.getElementById('sd'+i);
+    sd.className = 'step-dot' + (i<n?' done':i===n?' active':'');
+    if(i<4) document.getElementById('sl'+i).className = 'step-line'+(i<n?' done':'');
+  }
+  const simpleIndex = n <= 0 ? 1 : n === 1 ? 2 : 3;
+  for (let i=1; i<=3; i++) {
+    document.getElementById('simple-stage-'+i)?.classList.toggle('active', i === simpleIndex);
+  }
+}
+
+function goToStep2() {
+  const custom = document.getElementById('custom-topic').value.trim();
+  const mode = document.querySelector('.easy-choice-btn.active')?.getAttribute('data-topic-mode') || 'own';
+  if (mode === 'own' && !custom) {
+    alert(currentLanguage === 'de' ? 'Schreib kurz deine Idee oder Nische hinein.' : 'Briefly enter your idea or niche.');
+    document.getElementById('custom-topic').focus();
+    return;
+  }
+  if (mode === 'analyze' && !custom && !contentStrategyContext) {
+    alert(currentLanguage === 'de' ? 'Starte zuerst die Nischenanalyse oder wechsle zu „Eigene Idee“.' : 'Run the niche analysis first or switch to “My own idea”.');
+    return;
+  }
+  if(custom){ selTopic = custom; selTCtx = 'Eigenes Thema des Nutzers'; }
+  applySmartDefaults();
+  show('step2'); hide('step1'); setStep(1);
+}
+function goToStep1() { show('step1'); hide('step2'); setStep(0); }
+
+function show(id){ document.getElementById(id).classList.remove('hidden'); }
+function hide(id){ document.getElementById(id).classList.add('hidden'); }
+
+function applySmartDefaults() {
+  const topic = `${selTopic} ${selTCtx}`.toLowerCase();
+  if (!document.getElementById('audience').value.trim()) {
+    document.getElementById('audience').value = currentLanguage === 'de'
+      ? `Menschen, die konkrete Hilfe zu „${selTopic}“ suchen`
+      : `People looking for practical help with “${selTopic}”`;
+  }
+  const isHowTo = /lernen|anleitung|tipp|rezept|training|how|guide|tutorial/.test(topic);
+  const isBusiness = /business|marketing|verkauf|unternehmen|linkedin|finanz|money/.test(topic);
+  document.getElementById('content_goal').value = isBusiness ? 'authority' : 'teach';
+  document.getElementById('fmt').value = isHowTo ? 'tutorial' : 'story';
+  document.getElementById('voice').value = isBusiness ? 'direct' : 'warm';
+  document.getElementById('cta').value = isBusiness ? 'follow' : 'save';
+}
+
+// TREND SELECT
+function selTrend(el, topic, ctx) {
+  document.querySelectorAll('.trend-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  selTopic = topic; selTCtx = ctx;
+  document.getElementById('custom-topic').value = '';
+}
+
+function useIdea(button) {
+  const idea = button.getAttribute('data-idea-'+currentLanguage);
+  document.getElementById('custom-topic').value = idea;
+  document.querySelectorAll('.trend-card').forEach(c => c.classList.remove('sel'));
+  document.getElementById('custom-topic').focus();
+}
+
+function setTopicMode(mode, button) {
+  document.querySelectorAll('.easy-choice-btn').forEach(btn => btn.classList.toggle('active', btn === button));
+  document.querySelectorAll('[id^="topic-mode-"]').forEach(panel => panel.classList.remove('active'));
+  document.getElementById('topic-mode-'+mode)?.classList.add('active');
+}
+
+function cleanLinks(value) {
+  return value.split(/\s+/).map(item => item.trim()).filter(item => /^https?:\/\//i.test(item)).slice(0, 12);
+}
+
+async function analyzeNiche() {
+  const openRouterKey = document.getElementById('openrouter_key').value.trim();
+  const description = document.getElementById('niche_description').value.trim();
+  const offer = document.getElementById('offer_description').value.trim();
+  const angle = document.getElementById('unique_angle').value.trim();
+  const ownLinks = cleanLinks(document.getElementById('own_links').value);
+  const referenceLinks = cleanLinks(document.getElementById('reference_links').value);
+  if (!description && !ownLinks.length && !referenceLinks.length) {
+    alert(currentLanguage === 'de'
+      ? 'Beschreibe kurz deine Nische oder füge mindestens einen öffentlichen Link ein.'
+      : 'Describe your niche or add at least one public link.');
+    return;
+  }
+  if (!openRouterKey && !hasNetlifyBackend()) {
+    alert(currentLanguage === 'de'
+      ? 'Für die Link- und Nischenanalyse brauchst du den OpenRouter API Key. Öffne unten „Verbindungen einrichten“, wähle OpenRouter und füge den Key ein.'
+      : 'Niche and link analysis requires an OpenRouter API key. Open “Set up connections” below, choose OpenRouter and add the key.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-analyze-niche');
+  const resultBox = document.getElementById('brief-result');
+  btn.disabled = true;
+  btn.textContent = currentLanguage === 'de' ? 'Analysiere Positionierung, Zielgruppe & Content-Lücken …' : 'Analyzing positioning, audience and content gaps …';
+  resultBox.classList.remove('open');
+
+  const prompt = `Act as a senior content strategist. Analyze the user's niche and the publicly accessible URLs using web search.
+Do not copy reference content. Identify patterns, audience questions, differentiation opportunities and content gaps.
+
+NICHE DESCRIPTION: ${description || 'Not provided'}
+OFFER: ${offer || 'Not provided'}
+UNIQUE ANGLE: ${angle || 'Not provided'}
+OWN LINKS:
+${ownLinks.join('\n') || 'None'}
+REFERENCE / COMPETITOR LINKS:
+${referenceLinks.join('\n') || 'None'}
+
+Return valid JSON only with these keys:
+{
+  "niche_statement": "one specific sentence",
+  "target_audience": "specific people, situation, needs and level",
+  "positioning": "clear differentiated angle",
+  "content_pillars": ["4 to 6 specific pillars"],
+  "audience_questions": ["5 concrete recurring questions"],
+  "content_gaps": ["3 underused opportunities"],
+  "proof_assets": ["specific experiences, evidence or examples the creator should use"],
+  "avoid": ["generic patterns, risky claims or copied approaches to avoid"],
+  "starter_topics": ["8 original post ideas, each with a distinct insight"]
+}`;
+
+  try {
+    const requestBody = {
+      model: 'openrouter/auto',
+      messages: [{role:'user',content:prompt}],
+      web_search: true,
+      web_results: 10,
+      search_context_size: 'high',
+      response_format: {type:'json_object'},
+      temperature: 0.35,
+      max_tokens: 2200
+    };
+    const response = await fetch(hasNetlifyBackend() ? '/api/ai-content' : 'https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: hasNetlifyBackend() ? {
+        'Content-Type': 'application/json'
+      } : {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+openRouterKey,
+        'HTTP-Referer': location.origin === 'null' ? 'https://vyrl.app' : location.origin,
+        'X-OpenRouter-Title': 'vyrl Niche Intelligence'
+      },
+      body: JSON.stringify(hasNetlifyBackend() ? requestBody : {
+        model: requestBody.model,
+        messages: requestBody.messages,
+        plugins: [{id:'web',max_results:10}],
+        web_search_options: {search_context_size:'high'},
+        response_format: requestBody.response_format,
+        temperature: requestBody.temperature,
+        max_tokens: requestBody.max_tokens
+      })
+    });
+    const data = await response.json();
+    if (!response.ok || data.error) throw new Error(data.error?.message || 'OpenRouter analysis failed');
+    let raw = data.choices?.[0]?.message?.content || '';
+    raw = raw.replace(/^```json\s*|```$/g,'').trim();
+    const strategy = JSON.parse(raw);
+
+    contentStrategyContext = JSON.stringify(strategy);
+    localStorage.setItem('vyrl_content_strategy', contentStrategyContext);
+    if (strategy.niche_statement) {
+      document.getElementById('custom-topic').value = strategy.niche_statement;
+      selTopic = strategy.niche_statement;
+      selTCtx = strategy.positioning || 'Analyzed niche strategy';
+      document.querySelectorAll('.trend-card').forEach(c => c.classList.remove('sel'));
+    }
+    if (strategy.target_audience) document.getElementById('audience').value = strategy.target_audience;
+    if (strategy.proof_assets?.length) document.getElementById('must_include').value = strategy.proof_assets.join('; ');
+    if (strategy.avoid?.length) document.getElementById('avoid_content').value = strategy.avoid.join('; ');
+
+    const pillars = (strategy.content_pillars || []).map(p => `<span class="pillar-chip">${escapeHtml(p)}</span>`).join('');
+    resultBox.innerHTML = `<strong>${currentLanguage === 'de' ? 'Strategie erkannt:' : 'Strategy detected:'}</strong><br>${escapeHtml(strategy.positioning || strategy.niche_statement || '')}<div class="pillar-chips">${pillars}</div><br>${currentLanguage === 'de' ? 'Zielgruppe und Qualitätsfelder wurden automatisch vorausgefüllt.' : 'Audience and quality fields were filled automatically.'}`;
+    resultBox.classList.add('open');
+  } catch (error) {
+    resultBox.textContent = (currentLanguage === 'de' ? 'Analyse fehlgeschlagen: ' : 'Analysis failed: ') + error.message;
+    resultBox.style.background = '#FEF2F2';
+    resultBox.style.color = '#991B1B';
+    resultBox.classList.add('open');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = currentLanguage === 'de' ? '✨ Nische analysieren & Content-Strategie bauen' : '✨ Analyze niche and build content strategy';
+  }
+}
+
+// HOOK SELECT
+function selHook(el, type, ctx) {
+  document.querySelectorAll('.hook-pill').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  selHookType = type; selHookCtx = ctx;
+}
+
+// COPY
+function copyRes(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent);
+  btn.textContent = '✓ Kopiert'; btn.classList.add('copied');
+  setTimeout(()=>{ btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
+}
+
+// LOG
+function L(msg, t='info') {
+  const el = document.getElementById('runlog');
+  const now = new Date().toLocaleTimeString('de',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const cls = {ok:'lok',err:'lerr',wait:'lwait',agent:'lagent'}[t]||'linfo';
+  el.innerHTML += `<div class="le"><span class="lt">${now}</span><span class="${cls}">${msg}</span></div>`;
+  el.scrollTop = el.scrollHeight;
+}
+function PL(msg, t='info') {
+  const el = document.getElementById('postlog');
+  document.getElementById('postlog-card').classList.remove('hidden');
+  const now = new Date().toLocaleTimeString('de',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const cls = {ok:'lok',err:'lerr',wait:'lwait'}[t]||'linfo';
+  el.innerHTML += `<div class="le"><span class="lt">${now}</span><span class="${cls}">${msg}</span></div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+// CHECKS
+function ck(i) {
+  if (i === 4 && requiresVideo() && !videoUrl) {
+    alert(currentLanguage === 'de'
+      ? 'Es wurde noch kein Video erstellt. Prüfe bitte den OpenRouter-Key, dein Guthaben und die Meldung im Video-Bereich.'
+      : 'No video has been created yet. Check the OpenRouter key, account balance and the message in the video section.');
+    return;
+  }
+  checks[i] = !checks[i];
+  const el = document.getElementById('c'+i);
+  el.classList.toggle('on', checks[i]);
+  const allOk = checks.every(Boolean) && (!requiresVideo() || Boolean(videoUrl));
+  document.getElementById('btn-approve').disabled = !allOk;
+  if(allOk) document.getElementById('gate-card').classList.add('unlocked');
+  else document.getElementById('gate-card').classList.remove('unlocked');
+}
+
+function rejectContent() {
+  checks.fill(false);
+  for(let i=0;i<6;i++){ document.getElementById('c'+i).classList.remove('on'); }
+  document.getElementById('btn-approve').disabled = true;
+  document.getElementById('gate-card').classList.remove('unlocked');
+  alert('Kein Problem — überarbeite das Script und starte erneut wenn du möchtest.');
+}
+
+function approve() {
+  if (requiresVideo() && !videoUrl) {
+    alert(currentLanguage === 'de'
+      ? 'Noch kein fertiges Video vorhanden. Der Posting-Schritt wird erst nach erfolgreicher Video-Erstellung freigeschaltet.'
+      : 'There is no finished video yet. Publishing unlocks only after successful video generation.');
+    return;
+  }
+  const credentials = getInstagramCredentials();
+  if (selectedChannels.includes('instagram') && !credentials.oauth && (!credentials.token || !credentials.accountId)) {
+    alert(currentLanguage === 'de'
+      ? 'Instagram ist ausgewählt, aber noch nicht vollständig verbunden. Verbinde Meta oder trage Token und Account-ID manuell ein.'
+      : 'Instagram is selected but not fully connected. Connect Meta or enter the token and account ID manually.');
+    openConnections();
+    return;
+  }
+  show('step5'); hide('step4');
+  document.getElementById('post-url').value = videoUrl;
+  syncPublishCredentials();
+  validatePublishForm();
+  const note = document.getElementById('publish-mode-note');
+  if (note && location.protocol !== 'file:') note.classList.add('hidden');
+  setStep(4);
+}
+
+function syncPublishCredentials() {
+  const credentials = getInstagramCredentials();
+  const tokenField = document.getElementById('publish-ig-token');
+  const accountField = document.getElementById('publish-ig-account');
+  if (tokenField && !tokenField.value) tokenField.value = credentials.token;
+  if (accountField && !accountField.value) accountField.value = credentials.accountId;
+}
+
+function showPublishError(message) {
+  const error = document.getElementById('publish-error');
+  if (!error) return;
+  error.textContent = message;
+  error.classList.toggle('open', Boolean(message));
+}
+
+function isProtectedOpenRouterUrl(url) {
+  return /^https:\/\/openrouter\.ai\/api\/v1\/videos\/[^/]+\/content/i.test(url);
+}
+
+function validatePublishForm() {
+  const token = document.getElementById('publish-ig-token')?.value.trim() || '';
+  const account = document.getElementById('publish-ig-account')?.value.trim() || '';
+  const url = document.getElementById('post-url')?.value.trim() || '';
+  const state = document.getElementById('publish-connection-state');
+  const warning = document.getElementById('video-url-warning');
+  const credentialsOkay = Boolean(token && account);
+  if (state) {
+    state.textContent = credentialsOkay ? (currentLanguage === 'de' ? 'BEREIT' : 'READY') : (currentLanguage === 'de' ? 'UNVOLLSTÄNDIG' : 'INCOMPLETE');
+    state.classList.toggle('ok', credentialsOkay);
+  }
+  if (warning) {
+    const protectedUrl = isProtectedOpenRouterUrl(url);
+    warning.textContent = protectedUrl
+      ? (currentLanguage === 'de'
+          ? 'Diese OpenRouter-URL ist geschützt und kann von Instagram nicht geladen werden. In der Online-Version übernimmt das Backend Download und Upload automatisch.'
+          : 'This OpenRouter URL is protected and cannot be fetched by Instagram. In the online version, the backend automatically downloads and uploads it.')
+      : '';
+    warning.classList.toggle('open', protectedUrl);
+  }
+  return credentialsOkay && Boolean(url) && !isProtectedOpenRouterUrl(url);
+}
+
+function openConnections() {
+  show('step2'); hide('step4'); hide('step5'); setStep(1);
+  document.querySelectorAll('.advanced-content').forEach(section => section.open = true);
+  document.getElementById('api-content')?.classList.add('open');
+  document.getElementById('api-toggle')?.classList.add('open');
+  setTimeout(() => document.getElementById('api-toggle')?.scrollIntoView({behavior:'smooth',block:'center'}), 50);
+}
+
+function getInstagramCredentials() {
+  const publishToken = document.getElementById('publish-ig-token')?.value.trim() || '';
+  const publishAccount = document.getElementById('publish-ig-account')?.value.trim() || '';
+  const inputToken = document.getElementById('ig_tok')?.value.trim() || '';
+  const inputAccount = document.getElementById('ig_acc')?.value.trim() || '';
+  return {
+    token: publishToken || inputToken || igToken || sessionStorage.getItem('vyrl_session_ig_token') || '',
+    accountId: publishAccount || inputAccount || igAccountId || sessionStorage.getItem('vyrl_session_ig_account') || '',
+    oauth: Boolean(oauthConnections().meta)
+  };
+}
+
+// VIRAL SCORES
+function showScores(h, r, s) {
+  const t = Math.round((h+r+s)/3);
+  const set = (id,bid,v,c) => {
+    document.getElementById(id).textContent = v+'%';
+    document.getElementById(bid).style.width = v+'%';
+    document.getElementById(bid).style.background = c;
+    document.getElementById(id).style.color = c;
+  };
+  set('sc_h','sb_h',h,'#EF4444');
+  set('sc_r','sb_r',r,'#F59E0B');
+  set('sc_s','sb_s',s,'#10B981');
+  set('sc_t','sb_t',t,'#7C3AED');
+  const tips = {
+    PROVOCATION:'Provokation → +340% Comments vs. Generic Hook.',
+    NUMBER:'Zahlen-Hook → 78% höhere Watch-Through-Rate.',
+    CURIOSITY:'Neugier-Gap → +60% Replay-Rate.',
+    POV:'POV → höchste DM-Share-Rate 2026.',
+    BEFORE_AFTER:'Vorher/Nachher → 4× mehr Saves.'
+  };
+  document.getElementById('score-tip').textContent = tips[selHookType]||'';
+}
+
+function requiresVideo() {
+  return selectedChannels.some(channel => ['instagram','tiktok','youtube'].includes(channel));
+}
+
+function videoPrice(model) {
+  const prices = Object.values(model.pricing_skus || {})
+    .map(Number).filter(Number.isFinite);
+  return prices.length ? Math.min(...prices) : 999;
+}
+
+function chooseBestVideoModel(models) {
+  const vertical = models.filter(model =>
+    (model.supported_aspect_ratios || []).includes('9:16')
+  );
+  const pool = vertical.length ? vertical : models;
+  if (!pool.length) throw new Error(currentLanguage === 'de' ? 'OpenRouter meldet aktuell kein verfügbares Videomodell.' : 'OpenRouter currently reports no available video model.');
+
+  return [...pool].sort((a,b) => {
+    const score = model => {
+      const id = `${model.id || ''} ${model.name || ''}`.toLowerCase();
+      const resolutions = model.supported_resolutions || [];
+      const price = videoPrice(model);
+      let value = 0;
+      if (resolutions.includes('1080p')) value += qualityMode === 'quality' ? 45 : 24;
+      if (resolutions.includes('720p')) value += 12;
+      if ((model.supported_aspect_ratios || []).includes('9:16')) value += 35;
+      if (/veo|sora|runway|kling|wan/.test(id)) value += qualityMode === 'quality' ? 22 : 10;
+      if (qualityMode === 'speed') value += Math.max(0, 35 - price * 50);
+      if (qualityMode === 'balanced') value += Math.max(0, 22 - price * 24);
+      if (qualityMode === 'quality') value -= Math.min(price * 3, 8);
+      return value;
+    };
+    return score(b) - score(a);
+  })[0];
+}
+
+async function generateOpenRouterVideo(apiKey, prompt, requestedDuration) {
+  const headers = hasNetlifyBackend() ? {
+    'Content-Type': 'application/json'
+  } : {
+    'Authorization': 'Bearer '+apiKey,
+    'Content-Type': 'application/json'
+  };
+  L('[OpenRouter Video] Verfügbare Generatoren werden geprüft...','wait');
+  document.getElementById('r_vid').textContent = currentLanguage === 'de'
+    ? 'Suche den besten verfügbaren Video-Generator ...'
+    : 'Finding the best available video generator ...';
+
+  const modelsResp = await fetch(hasNetlifyBackend() ? '/api/video/models' : 'https://openrouter.ai/api/v1/videos/models', { headers });
+  const modelsData = await modelsResp.json();
+  if (!modelsResp.ok) throw new Error(modelsData.error?.message || 'Videomodelle konnten nicht geladen werden.');
+  const model = chooseBestVideoModel(modelsData.data || []);
+  L(`[OpenRouter Video] Gewählt: ${model.name || model.id}`,'agent');
+
+  const duration = Math.max(4, Math.min(requestedDuration, 15));
+  const submitResp = await fetch(hasNetlifyBackend() ? '/api/video/create' : 'https://openrouter.ai/api/v1/videos', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model: model.id,
+      prompt,
+      duration,
+      resolution: qualityMode === 'quality' && (model.supported_resolutions || []).includes('1080p') ? '1080p' : '720p',
+      aspect_ratio: (model.supported_aspect_ratios || []).includes('9:16') ? '9:16' : undefined,
+      generate_audio: true
+    })
+  });
+  const job = await submitResp.json();
+  if (!submitResp.ok || !job.id) throw new Error(job.error?.message || job.message || 'Videoauftrag konnte nicht gestartet werden.');
+
+  L(`[OpenRouter Video] Job ${job.id} gestartet`,'ok');
+  document.getElementById('r_vid').textContent = `${model.name || model.id} · Video wird generiert …`;
+  const pollingUrl = hasNetlifyBackend()
+    ? `/api/video/status?id=${encodeURIComponent(job.id)}`
+    : (job.polling_url || `https://openrouter.ai/api/v1/videos/${job.id}`);
+
+  for (let attempt=0; attempt<30; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 15000));
+    const pollResp = await fetch(pollingUrl, { headers });
+    const status = await pollResp.json();
+    if (!pollResp.ok) throw new Error(status.error?.message || 'Video-Status konnte nicht geladen werden.');
+    if (status.status === 'completed') {
+      const url = status.public_url || status.unsigned_urls?.[0] || '';
+      if (!url) {
+        throw new Error(currentLanguage === 'de'
+          ? 'Das Video ist fertig, OpenRouter liefert aber nur einen geschützten Download. Für Instagram muss die Online-Version das Video über das Backend in einen öffentlichen Speicher übertragen.'
+          : 'The video is ready, but OpenRouter only provides a protected download. The deployed backend must transfer it to public storage before Instagram can use it.');
+      }
+      document.getElementById('r_vid').textContent = `✅ ${model.name || model.id} · Video fertig`;
+      document.getElementById('vid_url_box').classList.remove('hidden');
+      document.getElementById('vid_url').href = url;
+      document.getElementById('vid_url').textContent = currentLanguage === 'de' ? 'Video öffnen / herunterladen →' : 'Open / download video →';
+      L('[OpenRouter Video] Video fertig ✓','ok');
+      return url;
+    }
+    if (['failed','cancelled','expired'].includes(status.status)) {
+      throw new Error(status.error || `Video-Job: ${status.status}`);
+    }
+    document.getElementById('r_vid').textContent = `${model.name || model.id} · ${status.status || 'in_progress'} …`;
+  }
+  throw new Error(currentLanguage === 'de' ? 'Video dauert länger als erwartet. Der Job läuft möglicherweise bei OpenRouter weiter.' : 'The video is taking longer than expected. The job may still be running on OpenRouter.');
+}
+
+// MAIN RUN
+async function startRun(options = {}) {
+  const { autoPublish = false, scheduled = false } = options;
+  const dur = document.getElementById('dur').value;
+  const fmt = document.getElementById('fmt').value;
+  const ctaType = document.getElementById('cta').value;
+  const aiKey = document.getElementById('ai_key').value.trim();
+  const openRouterKey = document.getElementById('openrouter_key').value.trim();
+  const openRouterModel = document.getElementById('openrouter_model').value;
+  const audience = document.getElementById('audience').value.trim() || (currentLanguage === 'de' ? 'Menschen, die sich konkret für dieses Thema interessieren' : 'People genuinely interested in this topic');
+  const contentGoal = document.getElementById('content_goal').value;
+  const expertise = document.getElementById('expertise').value;
+  const voice = document.getElementById('voice').value;
+  const mustInclude = document.getElementById('must_include').value.trim();
+  const avoidContent = document.getElementById('avoid_content').value.trim();
+  const useWebResearch = document.getElementById('web_research').checked;
+  igToken = document.getElementById('ig_tok').value.trim();
+  igAccountId = document.getElementById('ig_acc').value.trim();
+
+  const activeAIKey = aiProvider === 'openrouter' ? openRouterKey : aiKey;
+  if (!activeAIKey && !hasNetlifyBackend()) {
+    const msg = currentLanguage === 'de'
+      ? `Für die Content-Generierung fehlt der ${aiProvider === 'openrouter' ? 'OpenRouter' : 'Claude'} API Key.`
+      : `The ${aiProvider === 'openrouter' ? 'OpenRouter' : 'Claude'} API key is required to generate content.`;
+    if (scheduled) renderSchedule(msg);
+    else alert(msg);
+    return false;
+  }
+
+  ['step1','step2','step4','step5','proof-section'].forEach(hide);
+  hide('step2'); show('step3'); setStep(2);
+
+  const ctaMap = {save:'Speicher das für später',share:'Teile das mit jemandem dem es hilft',follow:'Folg @nexooooraai für mehr',link:'nexora-ai-solutions.netlify.app — Link in Bio'};
+  const hookMap = {
+    PROVOCATION:'Starte mit einer provokanten Aussage: "Die meisten [Zielgruppe] machen [Thema] komplett falsch..." — muss sofort Widerspruch oder Zustimmung auslösen.',
+    NUMBER:'Starte mit einer überraschend konkreten Zahl: "[X] Tools/Tipps die [messbares Ergebnis]" oder "Ich hab [X Zeit] gespart mit [Methode]".',
+    CURIOSITY:'"Was passiert wenn..." oder "Das wissen die meisten nicht über [Thema]..." — Neugier-Gap der zum Weiterschauen zwingt.',
+    POV:'"POV: [relatable Situation]" — versetz Zuschauer direkt in die Situation.',
+    BEFORE_AFTER:'"Vorher: [konkretes Problem]. Nachher: [konkretes Ergebnis]." — immer mit echten Zahlen.'
+  };
+  const fmtMap = {list:'Liste mit nummerierten Tipps, jeder Punkt ein konkreter Mehrwert',tutorial:'Step-by-Step Anleitung, nummerierte Schritte',story:'Persönliche Story, ich-Perspektive, authentisch',comparison:'Direkter Vergleich, Pro/Contra, Zahlen'};
+
+  L('[vyrl] Thema: "'+selTopic+'"','agent');
+  L('[vyrl] Hook: '+selHookType+' | '+dur+'s | '+fmt,'info');
+  L('[vyrl] Script wird generiert...','wait');
+
+  const sys = `Du bist vyrl — ein vielseitiger Social-Content-Agent für Menschen, Creator und Unternehmen aus ALLEN Themenbereichen.
+Brand: @nexooooraai | nexora-ai-solutions.netlify.app | cal.com/nexora-ai/30min | mail.ai.nexora@gmail.com
+Sprache: ${currentLanguage === 'de' ? 'DEUTSCH' : 'ENGLISH'}. Zielgruppe und Tonalität passend zum frei gewählten Thema ableiten. Keine IT- oder Business-Ausrichtung annehmen, außer das Thema verlangt es.
+
+THEMA: "${selTopic}"
+KONTEXT: ${selTCtx}
+ANALYSIERTE CONTENT-STRATEGIE: ${contentStrategyContext || 'Keine Nischenanalyse vorhanden'}
+ZIELGRUPPE: ${audience}
+CONTENT-ZIEL: ${contentGoal}
+WISSENSNIVEAU: ${expertise}
+MARKENSTIMME: ${voice}
+MUSS ENTHALTEN: ${mustInclude || 'Keine zusätzlichen Vorgaben'}
+UNBEDINGT VERMEIDEN: ${avoidContent || 'Leere Floskeln, erfundene Fakten, generische Tipps, unbelegte Zahlen und austauschbare Aussagen'}
+HOOK-FORMEL: ${selHookType} — ${hookMap[selHookType]}
+FORMAT: ${fmtMap[fmt]}
+LÄNGE: ${dur} Sekunden
+CTA-ZIEL: ${ctaMap[ctaType]}
+PLATTFORMEN: ${selectedChannels.join(', ')}
+
+QUALITÄTSSTANDARD (zwingend):
+- Liefere eine klare, nicht offensichtliche Kernaussage. Kein "Hier sind 3 Tipps"-Einheitsbrei ohne neue Erkenntnis.
+- Jeder Satz muss entweder informieren, überraschen, beweisen oder die Handlung vorantreiben.
+- Nutze konkrete Beispiele, Mechanismen, Schritte oder echte belegte Fakten. Erfinde niemals Statistiken, Trends oder Quellen.
+- Wenn aktuelle Recherche vorhanden ist, verwende nur überprüfbare Erkenntnisse daraus und nenne Quellen.
+- Schreibe passend zur angegebenen Zielgruppe und ihrem Wissensniveau, nicht für "alle".
+- Vermeide KI-Floskeln wie "In der heutigen schnelllebigen Welt", "Gamechanger", "revolutionär" oder leere Superlative.
+- Hook in Sekunde 1-2; danach sofort Nutzen oder Konflikt. Kein langes Intro.
+- Das Script muss gesprochen natürlich klingen und zeitlich wirklich in ${dur} Sekunden passen.
+- Erstelle für jede ausgewählte Plattform eine passende Caption-Variante, nicht dieselbe Caption überall.
+- Der Video-Prompt muss eine konkrete visuelle Idee mit Handlung, Kamera, Licht, Ort, Bewegung und Stil beschreiben; keine Schrift im generierten Bild.
+
+AUSGABEFORMAT (exakt einhalten, kein Markdown):
+
+TREND:
+[Was ist für diese konkrete Zielgruppe aktuell relevant? 2-3 substanzielle Sätze. Keine erfundenen Zahlen.]
+
+HEADLINE:
+[Kurze, spezifische Headline, max. 7 Wörter.]
+
+SCRIPT:
+[Natürlich gesprochenes Script für exakt ungefähr ${dur}s. Konkrete Substanz statt Allgemeinplätze.]
+
+CAPTION:
+[Instagram-Caption mit konkretem Mehrwert, CTA und höchstens 3-5 präzisen Hashtags.]
+
+PLATFORM_VARIANTS:
+[Für jede Plattform in PLATTFORMEN eine kurze, nativ passende Version. Format: PLATTFORM: Text]
+
+VIDEO_PROMPT:
+[Englischer Text-to-video Prompt. Vertikal 9:16. Beschreibe Motiv, Handlung, 2-4 Shots als eine fließende Sequenz, Kamerabewegung, Licht, Stimmung, realistische Details und visuelle Kontinuität. No text, no subtitles, no logos.]
+
+TIMING:
+[Konkrete Empfehlung passend zur Zielgruppe; Unsicherheit ehrlich nennen.]
+
+SOURCES:
+[Nur wenn recherchiert: 2-5 verwendete URLs mit kurzem Titel, eine pro Zeile. Sonst: Keine externe Recherche.]
+
+VIRAL_SCORES:
+HOOK:[0-100]
+RETENTION:[0-100]
+SHARE:[0-100]`;
+
+  try {
+    L('['+(aiProvider === 'openrouter' ? 'OpenRouter' : 'Claude')+'] Qualitäts-Run läuft...','wait');
+    const isOpenRouter = aiProvider === 'openrouter';
+    const backendPayload = {
+      model: openRouterModel || 'openrouter/auto',
+      max_tokens: 2600,
+      temperature: 0.65,
+      messages: [{ role: 'system', content: sys }, { role: 'user', content: 'Research if enabled, then create one genuinely useful, specific content package. Run an internal quality critique before returning only the required format.' }],
+      web_search: useWebResearch,
+      web_results: qualityMode === 'quality' ? 8 : 5,
+      search_context_size: qualityMode === 'quality' ? 'high' : 'medium'
+    };
+    const resp = await fetch(hasNetlifyBackend() ? '/api/ai-content' : (isOpenRouter ? 'https://openrouter.ai/api/v1/chat/completions' : 'https://api.anthropic.com/v1/messages'), {
+      method: 'POST',
+      headers: hasNetlifyBackend() ? {
+        'Content-Type': 'application/json'
+      } : isOpenRouter ? {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+openRouterKey,
+        'HTTP-Referer': location.origin === 'null' ? 'https://vyrl.app' : location.origin,
+        'X-OpenRouter-Title': 'vyrl'
+      } : {
+        'Content-Type': 'application/json',
+        'x-api-key': aiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify(hasNetlifyBackend() ? backendPayload : isOpenRouter
+        ? {
+            model: openRouterModel,
+            max_tokens: 2600,
+            temperature: 0.65,
+            messages: [{ role: 'system', content: sys }, { role: 'user', content: 'Research if enabled, then create one genuinely useful, specific content package. Run an internal quality critique before returning only the required format.' }],
+            ...(useWebResearch ? { plugins: [{ id: 'web', max_results: qualityMode === 'quality' ? 8 : 5 }], web_search_options: { search_context_size: qualityMode === 'quality' ? 'high' : 'medium' } } : {})
+          }
+        : { model: 'claude-sonnet-4-6', max_tokens: 2200, system: sys, messages: [{ role: 'user', content: 'Create one genuinely useful, specific content package. Run an internal quality critique before returning only the required format.' }] })
+    });
+    const data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error?.message || `${isOpenRouter ? 'OpenRouter' : 'Claude'} API error`);
+    const raw = (hasNetlifyBackend() || isOpenRouter) ? (data.choices?.[0]?.message?.content || '') : (data.content?.[0]?.text || '');
+    if (!raw) throw new Error('No content returned by the AI.');
+
+    const g = (k) => { const m = raw.match(new RegExp(k+':\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|$)','i')); return m?m[1].trim():''; };
+    const trend = g('TREND'), headline = g('HEADLINE'), script = g('SCRIPT'), cap = g('CAPTION'), platformVariants = g('PLATFORM_VARIANTS'), videoPrompt = g('VIDEO_PROMPT'), timing = g('TIMING'), sources = g('SOURCES'), scRaw = g('VIRAL_SCORES');
+    captionText = cap;
+
+    L('[vyrl] Script generiert ✓','ok');
+    L('[vyrl] Caption + Hashtags optimiert ✓','ok');
+    L('[vyrl] Posting-Zeitempfehlung ✓','ok');
+
+    document.getElementById('r_trend').textContent = trend;
+    document.getElementById('r_script').textContent = script;
+    document.getElementById('r_caption').textContent = cap + (platformVariants ? '\n\n── Plattform-Varianten ──\n' + platformVariants : '');
+    document.getElementById('r_timing').textContent = timing;
+    if (sources && !/keine externe recherche/i.test(sources)) {
+      document.getElementById('sources-block').classList.remove('hidden');
+      document.getElementById('r_sources').textContent = sources;
+    } else {
+      document.getElementById('sources-block').classList.add('hidden');
+    }
+    document.getElementById('r_dur').textContent = dur;
+    document.getElementById('r_hook_lbl').textContent = selHookType;
+
+    const hm = scRaw.match(/HOOK:(\d+)/i), rm = scRaw.match(/RETENTION:(\d+)/i), sm = scRaw.match(/SHARE:(\d+)/i);
+    showScores(parseInt(hm?.[1]||'78'), parseInt(rm?.[1]||'72'), parseInt(sm?.[1]||'70'));
+
+    // OPENROUTER VIDEO
+    videoUrl = '';
+    document.getElementById('vid_url_box').classList.add('hidden');
+    if (!openRouterKey && !hasNetlifyBackend()) {
+      L('[Video] OpenRouter Key fehlt — Video übersprungen','wait');
+      document.getElementById('r_vid').textContent = currentLanguage === 'de'
+        ? 'Für ein echtes KI-Video bitte OpenRouter auswählen und den OpenRouter API Key eintragen.'
+        : 'Select OpenRouter and add an OpenRouter API key to generate a real AI video.';
+    } else if (!videoPrompt) {
+      L('[Video] Kein brauchbarer Video-Prompt erzeugt','err');
+      document.getElementById('r_vid').textContent = currentLanguage === 'de'
+        ? 'Der Content-Run hat keinen Video-Prompt geliefert. Bitte Inhalt überarbeiten und erneut starten.'
+        : 'The content run did not return a video prompt. Please revise and run again.';
+    } else {
+      try {
+        videoUrl = await generateOpenRouterVideo(openRouterKey, videoPrompt, Number(dur));
+      } catch (videoError) {
+        L('[OpenRouter Video] '+videoError.message,'err');
+        document.getElementById('r_vid').textContent = '❌ '+videoError.message;
+      }
+    }
+
+    hide('step3');
+    if (autoPublish) {
+      if (!selectedChannels.includes('instagram')) {
+        show('step4'); setStep(3);
+        renderSchedule(currentLanguage === 'de'
+          ? 'Content erstellt. Die gewählten Plattformen benötigen noch ihre Server-Verbindung.'
+          : 'Content created. The selected platforms still require their server connection.');
+        return true;
+      }
+      if (!videoUrl) {
+        show('step4'); setStep(3);
+        renderSchedule(currentLanguage === 'de'
+          ? 'Content erstellt, aber ohne fertiges Video nicht automatisch gepostet.'
+          : 'Content created, but automatic publishing needs a finished video.');
+        return false;
+      }
+      show('step5');
+      document.getElementById('post-url').value = videoUrl;
+      setStep(4);
+      await doPost();
+    } else {
+      show('step4'); setStep(3);
+    }
+    return true;
+
+  } catch(e) {
+    L('[Fehler] '+e.message,'err');
+    L('[Info] Prüfe deine Internetverbindung und lade die Seite neu.','info');
+    if (scheduled) renderSchedule((currentLanguage === 'de' ? 'Automatischer Lauf fehlgeschlagen: ' : 'Automatic run failed: ') + e.message);
+    return false;
+  }
+}
+
+// POST TO INSTAGRAM
+async function doPost() {
+  showPublishError('');
+  const credentials = getInstagramCredentials();
+  igToken = credentials.token;
+  igAccountId = credentials.accountId;
+  const url = document.getElementById('post-url').value.trim();
+
+  if(!url){
+    showPublishError(currentLanguage === 'de'
+      ? 'Es fehlt ein fertig generiertes Video. Gehe zurück und starte die Video-Erstellung erneut.'
+      : 'A finished generated video is missing. Go back and run video generation again.');
+    return false;
+  }
+
+  if (isProtectedOpenRouterUrl(url)) {
+    showPublishError(currentLanguage === 'de'
+      ? 'Diese OpenRouter-Video-URL ist nicht öffentlich. Instagram kann sie nicht abrufen. Öffne die Online-Version mit Backend oder verwende eine öffentliche MP4-URL.'
+      : 'This OpenRouter video URL is not public. Instagram cannot fetch it. Use the deployed backend version or provide a public MP4 URL.');
+    validatePublishForm();
+    return false;
+  }
+
+  if (credentials.oauth && (!igToken || !igAccountId)) {
+    if (location.protocol === 'file:') {
+      showPublishError(currentLanguage === 'de'
+        ? 'Du öffnest vyrl gerade als lokale Datei. Der sichere Meta-Login und das automatische Posten benötigen eine online veröffentlichte Version mit Backend. Nutze lokal die manuelle Token-Eingabe oder veröffentliche die App zuerst.'
+        : 'You are opening vyrl as a local file. Secure Meta login and automatic publishing require an online version with a backend. Use manual token entry locally or deploy the app first.');
+      return false;
+    }
+    return publishInstagramViaBackend(url);
+  }
+
+  if(!igToken || !igAccountId){
+    showPublishError(currentLanguage === 'de'
+      ? 'Instagram Token oder Account-ID fehlen. Die App liest beide Felder beim Klick neu ein. Öffne „Weitere Einstellungen & Verbindungen“ → „Technische Einrichtung manuell anzeigen“ und prüfe beide Werte.'
+      : 'Instagram token or account ID is missing. The app rereads both fields when you click. Open “More settings and connections” → “Show manual technical setup” and check both values.');
+    validatePublishForm();
+    return false;
+  }
+  sessionStorage.setItem('vyrl_session_ig_token', igToken);
+  sessionStorage.setItem('vyrl_session_ig_account', igAccountId);
+
+  const btn = document.getElementById('btn-post');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>Postet auf Instagram...';
+
+  PL('[vyrl] Instagram Publishing startet','info');
+  PL('[Meta] Erstelle Reel Container...','wait');
+
+  try {
+    const cr = await fetch('https://graph.instagram.com/v21.0/'+igAccountId+'/media', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ media_type:'REELS', video_url: url, caption: captionText, share_to_feed: true, access_token: igToken })
+    });
+    const cd = await cr.json();
+    if(cd.error){
+      PL('[Fehler] '+cd.error.message,'err');
+      PL('[Tipp] Scope "instagram_content_publish" im Token benötigt','wait');
+      btn.disabled=false; btn.textContent='Erneut versuchen'; return false;
+    }
+    PL('[Meta] Container erstellt: '+cd.id+' ✓','ok');
+    PL('[Meta] Warte 12s auf Video-Verarbeitung...','wait');
+    await new Promise(r=>setTimeout(r,12000));
+    PL('[Meta] Veröffentliche Reel...','wait');
+
+    const pr = await fetch('https://graph.instagram.com/v21.0/'+igAccountId+'/media_publish', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ creation_id: cd.id, access_token: igToken })
+    });
+    const pd = await pr.json();
+    if(pd.error){ PL('[Fehler] '+pd.error.message,'err'); btn.disabled=false; btn.textContent='Erneut versuchen'; return false; }
+
+    PL('[vyrl] Reel live! ID: '+pd.id+' 🎉','ok');
+    let proofLink = 'https://www.instagram.com/';
+    try {
+      const detailResp = await fetch('https://graph.instagram.com/v21.0/'+pd.id+'?fields=permalink&access_token='+encodeURIComponent(igToken));
+      const detail = await detailResp.json();
+      if (detail.permalink) proofLink = detail.permalink;
+    } catch (_) {}
+    document.getElementById('proof-url').href = proofLink;
+    document.getElementById('proof-url').textContent = proofLink;
+    document.getElementById('run-meta').innerHTML = 'Hook: '+selHookType+' · Score: '+document.getElementById('sc_t').textContent+'<br>'+new Date().toLocaleString('de')+' · Media ID: '+pd.id;
+    hide('step5'); show('proof-section'); setStep(4);
+    renderSchedule(currentLanguage === 'de' ? 'Letzter automatischer Post war erfolgreich.' : 'The latest automatic post was successful.');
+    return true;
+
+  } catch(e) {
+    PL('[Fehler] '+e.message,'err');
+    PL('[Tipp] Direkte Meta API-Aufrufe aus dem Browser können durch CORS blockiert sein.','wait');
+    PL('[Lösung] Für Produktion: kleinen Backend-Proxy aufsetzen (z.B. Netlify Functions).','info');
+    btn.disabled=false; btn.textContent='Erneut versuchen';
+    renderSchedule((currentLanguage === 'de' ? 'Posting fehlgeschlagen: ' : 'Publishing failed: ') + e.message);
+    return false;
+  }
+}
+
+async function publishInstagramViaBackend(url) {
+  const btn = document.getElementById('btn-post');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>'+(currentLanguage === 'de' ? 'Postet über sichere Verbindung...' : 'Publishing securely...');
+  try {
+    const response = await fetch('/api/publish/instagram', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({video_url:url,caption:captionText,share_to_feed:true})
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || result.message || 'Publishing failed');
+    const permalink = result.permalink || 'https://www.instagram.com/';
+    document.getElementById('proof-url').href = permalink;
+    document.getElementById('proof-url').textContent = permalink;
+    document.getElementById('run-meta').textContent = new Date().toLocaleString(currentLanguage === 'de' ? 'de' : 'en');
+    hide('step5'); show('proof-section'); setStep(4);
+    return true;
+  } catch (error) {
+    alert((currentLanguage === 'de' ? 'Sicheres Posting fehlgeschlagen: ' : 'Secure publishing failed: ')+error.message);
+    btn.disabled = false;
+    btn.textContent = currentLanguage === 'de' ? '📲 Erneut versuchen' : '📲 Try again';
+    return false;
+  }
+}
+</script>
+</body>
+</html>

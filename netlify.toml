@@ -1,0 +1,71 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/ai-content"
+  to = "/.netlify/functions/ai-content"
+  status = 200
+
+[[redirects]]
+  from = "/api/video/models"
+  to = "/.netlify/functions/video-models"
+  status = 200
+
+[[redirects]]
+  from = "/api/video/create"
+  to = "/.netlify/functions/video-create"
+  status = 200
+
+[[redirects]]
+  from = "/api/video/status"
+  to = "/.netlify/functions/video-status"
+  status = 200
+
+[[redirects]]
+  from = "/api/video/public/:id"
+  to = "/.netlify/functions/video-public?id=:id"
+  status = 200
+
+[[redirects]]
+  from = "/api/publish/instagram"
+  to = "/.netlify/functions/publish-instagram"
+  status = 200
+
+[[redirects]]
+  from = "/api/schedule"
+  to = "/.netlify/functions/schedule"
+  status = 200
+
+[[redirects]]
+  from = "/api/connections"
+  to = "/.netlify/functions/connections"
+  status = 200
+
+[[redirects]]
+  from = "/api/oauth/:provider/start"
+  to = "/.netlify/functions/oauth-start?provider=:provider"
+  status = 200
+
+[[redirects]]
+  from = "/api/oauth/:provider/callback"
+  to = "/.netlify/functions/oauth-callback?provider=:provider"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+
+[functions."scheduled-post"]
+  schedule = "*/15 * * * *"
