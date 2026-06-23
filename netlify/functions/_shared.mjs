@@ -45,8 +45,8 @@ export function publicConnection(connection) {
   };
 }
 
-export function openRouterHeaders() {
-  const key = process.env.OPENROUTER_API_KEY;
+export function openRouterHeaders(request) {
+  const key = process.env.OPENROUTER_API_KEY || request?.headers?.get("x-vyrl-openrouter-key");
   if (!key) throw new Error("OPENROUTER_API_KEY is not configured in Netlify.");
   return {
     authorization: `Bearer ${key}`,

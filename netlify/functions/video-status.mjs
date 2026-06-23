@@ -5,7 +5,7 @@ export default async (request) => {
     const id = new URL(request.url).searchParams.get("id");
     if (!id) return json({ error: "Missing video id" }, 400);
     const response = await fetch(`https://openrouter.ai/api/v1/videos/${encodeURIComponent(id)}`, {
-      headers: openRouterHeaders(),
+      headers: openRouterHeaders(request),
     });
     const result = await response.json();
     if (result.status === "completed") {

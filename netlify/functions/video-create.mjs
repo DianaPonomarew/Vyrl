@@ -6,7 +6,7 @@ export default async (request) => {
     const body = await readJson(request);
     const response = await fetch("https://openrouter.ai/api/v1/videos", {
       method: "POST",
-      headers: openRouterHeaders(),
+      headers: openRouterHeaders(request),
       body: JSON.stringify({
         model: body.model,
         prompt: body.prompt,

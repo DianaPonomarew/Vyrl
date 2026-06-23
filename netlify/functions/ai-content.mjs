@@ -19,7 +19,7 @@ export default async (request) => {
     };
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-      headers: openRouterHeaders(),
+      headers: openRouterHeaders(request),
       body: JSON.stringify(payload),
     });
     const result = await response.json();

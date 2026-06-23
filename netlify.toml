@@ -11,6 +11,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/config-status"
+  to = "/.netlify/functions/config-status"
+  status = 200
+
+[[redirects]]
   from = "/api/video/models"
   to = "/.netlify/functions/video-models"
   status = 200

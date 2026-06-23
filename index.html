@@ -347,6 +347,25 @@
   }
   .schedule-summary strong { color: var(--gray-900); }
   .schedule-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .scenario-box {
+    margin: 0 0 18px;
+    padding: 16px;
+    border: 1px solid #e8ddff;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #fbf9ff, #f5fff0);
+  }
+  .scenario-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+  .scenario-head strong { display:block; color:var(--gray-900); font-size:15px; }
+  .scenario-head small { display:block; color:var(--gray-600); margin-top:3px; line-height:1.4; }
+  .scenario-grid { display:grid; grid-template-columns:minmax(150px, .8fr) minmax(180px, 1.2fr); gap:10px; }
+  .scenario-grid input, .scenario-grid select { width:100%; }
+  .scenario-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .scenario-buttons button {
+    border:1px solid #ddd2f4; background:#fff; color:var(--gray-900);
+    border-radius:11px; padding:9px 12px; font-weight:750; cursor:pointer;
+  }
+  .scenario-buttons .scenario-save { background:var(--purple); border-color:var(--purple); color:#fff; }
+  .scenario-status { min-height:18px; margin-top:8px; color:var(--gray-600); font-size:12px; }
   .btn-small {
     flex: 1; border: 0; border-radius: var(--radius-sm); padding: 11px 12px;
     font: inherit; font-size: 12px; font-weight: 750; cursor: pointer;
@@ -561,6 +580,18 @@
   .publish-error.open { display: block; }
   .video-url-warning { display: none; margin-top: 7px; color: #92400E; background: #FFFBEB; padding: 8px; border-radius: 9px; font-size: 9.5px; line-height: 1.45; }
   .video-url-warning.open { display: block; }
+  .quick-key-card {
+    display: none; margin: 12px 0; padding: 14px; border-radius: 16px;
+    border: 1.5px solid #D7C8FF; background: linear-gradient(125deg,#F4EEFF,#FFF);
+  }
+  .quick-key-card.open { display: block; }
+  .quick-key-card strong { display: block; font-size: 12px; margin-bottom: 4px; }
+  .quick-key-card p { font-size: 10px; color: var(--gray-600); line-height: 1.5; margin-bottom: 9px; }
+  .quick-key-row { display: flex; gap: 7px; }
+  .quick-key-row input { flex: 1; min-width: 0; border: 1.5px solid var(--gray-200); border-radius: 11px; padding: 9px 10px; font-size: 11px; outline: none; }
+  .quick-key-row input:focus { border-color: var(--purple); }
+  .quick-key-row button { border: 0; border-radius: 10px; padding: 8px 11px; background: var(--purple); color: #fff; font-size: 10px; font-weight: 800; cursor: pointer; }
+  .quick-key-status { margin-top: 7px; font-size: 9px; color: var(--gray-500); }
   .key-item { position: relative; }
   .key-label-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
   .key-label-row label { margin: 0; }
@@ -959,6 +990,7 @@
     .check-grid { grid-template-columns: 1fr; }
     .key-grid { grid-template-columns: 1fr; }
     .schedule-grid { grid-template-columns: 1fr; }
+    .scenario-grid { grid-template-columns:1fr; }
     .channel-more { grid-template-columns: 1fr 1fr; }
     .connect-fields { grid-template-columns: 1fr; }
     .connect-wide { grid-column: auto; }
@@ -1305,12 +1337,43 @@
     </details>
 
     <div class="card autopilot-card">
+      <div class="quick-key-card" id="quick-key-card">
+        <strong data-de="OpenRouter-Key hinzufügen" data-en="Add OpenRouter key">OpenRouter-Key hinzufügen</strong>
+        <p data-de="Schneller Test: Der Key bleibt nur in diesem Browser-Tab. Für täglichen Autopilot und sichere Videos solltest du ihn später als OPENROUTER_API_KEY in Netlify hinterlegen." data-en="Quick test: The key stays only in this browser tab. For daily autopilot and secure videos, add it later as OPENROUTER_API_KEY in Netlify.">Schneller Test: Der Key bleibt nur in diesem Browser-Tab. Für täglichen Autopilot und sichere Videos solltest du ihn später als OPENROUTER_API_KEY in Netlify hinterlegen.</p>
+        <div class="quick-key-row">
+          <input type="password" id="quick-openrouter-key" placeholder="sk-or-v1-...">
+          <button type="button" onclick="saveQuickOpenRouterKey()" data-de="Übernehmen" data-en="Use key">Übernehmen</button>
+        </div>
+        <div class="quick-key-status" id="quick-key-status"></div>
+      </div>
       <div class="autopilot-head">
         <div>
           <div class="autopilot-title">⏰ <span data-de="Daily Autopilot" data-en="Daily Autopilot">Daily Autopilot</span></div>
           <p class="sub" style="margin:5px 0 0;" data-de="Einmal einstellen. Jeden Tag neuen Content erstellen und posten." data-en="Set it once. Create and publish fresh content every day.">Einmal einstellen. Jeden Tag neuen Content erstellen und posten.</p>
         </div>
         <span class="status-pill" id="schedule-status" data-de="NICHT AKTIV" data-en="NOT ACTIVE">NICHT AKTIV</span>
+      </div>
+      <div class="scenario-box">
+        <div class="scenario-head">
+          <span>
+            <strong data-de="Deine Content-Szenarien" data-en="Your content scenarios">Deine Content-Szenarien</strong>
+            <small data-de="Speichere z. B. „Facebook – tägliche Immobilien-Tipps“ und bearbeite es später jederzeit." data-en="Save e.g. “Facebook – daily real estate tips” and edit it anytime.">Speichere z. B. „Facebook – tägliche Immobilien-Tipps“ und bearbeite es später jederzeit.</small>
+          </span>
+          <span class="status-pill" data-de="WIEDERVERWENDBAR" data-en="REUSABLE">WIEDERVERWENDBAR</span>
+        </div>
+        <div class="scenario-grid">
+          <select id="scenario-select" onchange="previewScenarioSelection()">
+            <option value="" data-de="Gespeichertes Szenario wählen …" data-en="Choose a saved scenario …">Gespeichertes Szenario wählen …</option>
+          </select>
+          <input id="scenario-name" type="text" data-placeholder-de="Name, z. B. Facebook Immobilien" data-placeholder-en="Name, e.g. Facebook Real Estate" placeholder="Name, z. B. Facebook Immobilien">
+        </div>
+        <div class="scenario-buttons">
+          <button type="button" class="scenario-save" onclick="saveScenario()" data-de="Szenario speichern" data-en="Save scenario">Szenario speichern</button>
+          <button type="button" onclick="loadScenario()" data-de="Laden & bearbeiten" data-en="Load & edit">Laden & bearbeiten</button>
+          <button type="button" onclick="newScenario()" data-de="Als neu" data-en="Save as new">Als neu</button>
+          <button type="button" onclick="deleteScenario()" data-de="Löschen" data-en="Delete">Löschen</button>
+        </div>
+        <div class="scenario-status" id="scenario-status" data-de="Content-Einstellungen und Konto-IDs werden gespeichert. API-Keys und Tokens niemals." data-en="Content settings and account IDs are saved. API keys and tokens never are.">Content-Einstellungen und Konto-IDs werden gespeichert. API-Keys und Tokens niemals.</div>
       </div>
       <div class="schedule-grid">
         <div class="setting-item">
@@ -1433,6 +1496,15 @@
               <span class="provider-logo">↗️</span>
               <span><strong>OpenRouter</strong><small data-de="Viele KI-Modelle mit einem Key" data-en="Many AI models with one key">Viele KI-Modelle mit einem Key</small></span>
             </button>
+          </div>
+          <div class="quick-key-card open" id="connection-key-card">
+            <strong data-de="OpenRouter API Key" data-en="OpenRouter API key">OpenRouter API Key</strong>
+            <p data-de="Für einen schnellen Start kannst du den Key hier eintragen. Er bleibt nur im aktuellen Browser-Tab. Für den täglichen Autopilot kannst du denselben Key später zusätzlich sicher in Netlify speichern." data-en="For a quick start, enter the key here. It remains only in the current browser tab. For daily autopilot, save the same key securely in Netlify later.">Für einen schnellen Start kannst du den Key hier eintragen. Er bleibt nur im aktuellen Browser-Tab. Für den täglichen Autopilot kannst du denselben Key später zusätzlich sicher in Netlify speichern.</p>
+            <div class="quick-key-row">
+              <input type="password" id="connection-openrouter-key" placeholder="sk-or-v1-...">
+              <button type="button" onclick="saveConnectionOpenRouterKey()" data-de="Übernehmen" data-en="Use key">Übernehmen</button>
+            </div>
+            <div class="quick-key-status" id="connection-key-status"></div>
           </div>
           <span class="provider-label" data-de="2. Passenden Zugang eintragen" data-en="2. Add the matching access key">2. Passenden Zugang eintragen</span>
           <div class="oauth-hub">
@@ -1890,6 +1962,61 @@ function hasNetlifyBackend() {
   return location.protocol === 'https:' || location.hostname.endsWith('.netlify.app');
 }
 
+function getSessionOpenRouterKey() {
+  return sessionStorage.getItem('vyrl_openrouter_key') || document.getElementById('quick-openrouter-key')?.value.trim() || document.getElementById('openrouter_key')?.value.trim() || '';
+}
+
+function saveQuickOpenRouterKey() {
+  const value = document.getElementById('quick-openrouter-key')?.value.trim() || '';
+  if (!/^sk-or-/i.test(value)) {
+    document.getElementById('quick-key-status').textContent = currentLanguage === 'de'
+      ? 'Der Key sieht nicht wie ein OpenRouter-Key aus.'
+      : 'This does not look like an OpenRouter key.';
+    return;
+  }
+  sessionStorage.setItem('vyrl_openrouter_key', value);
+  const original = document.getElementById('openrouter_key');
+  if (original) original.value = value;
+  document.getElementById('quick-key-status').textContent = currentLanguage === 'de'
+    ? '✓ Für diese Browsersitzung übernommen.'
+    : '✓ Active for this browser session.';
+  syncOpenRouterKeyFields(value);
+  refreshConfigStatus();
+}
+
+function saveConnectionOpenRouterKey() {
+  const value = document.getElementById('connection-openrouter-key')?.value.trim() || '';
+  const status = document.getElementById('connection-key-status');
+  if (!/^sk-or-/i.test(value)) {
+    if (status) status.textContent = currentLanguage === 'de'
+      ? 'Bitte einen gültigen OpenRouter-Key einfügen (beginnt meist mit sk-or-v1-).'
+      : 'Enter a valid OpenRouter key (usually starts with sk-or-v1-).';
+    return;
+  }
+  sessionStorage.setItem('vyrl_openrouter_key', value);
+  syncOpenRouterKeyFields(value);
+  if (status) status.textContent = currentLanguage === 'de'
+    ? '✓ Browser-Key aktiv. Content und Videos können jetzt erstellt werden.'
+    : '✓ Browser key active. Content and videos can now be generated.';
+  refreshConfigStatus();
+}
+
+function syncOpenRouterKeyFields(value = getSessionOpenRouterKey()) {
+  ['quick-openrouter-key','connection-openrouter-key','openrouter_key'].forEach(id => {
+    const field = document.getElementById(id);
+    if (field && field.value !== value) field.value = value;
+  });
+}
+
+function backendHeaders(extra = {}) {
+  const key = getSessionOpenRouterKey();
+  return {
+    'Content-Type':'application/json',
+    ...(key ? {'X-Vyrl-OpenRouter-Key': key} : {}),
+    ...extra
+  };
+}
+
 // LANGUAGE
 function setLanguage(lang) {
   currentLanguage = lang;
@@ -1908,22 +2035,17 @@ function setLanguage(lang) {
 }
 
 // DAILY SCHEDULER
-function getSchedule() {
-  try { return JSON.parse(localStorage.getItem('vyrl_daily_schedule') || 'null'); }
-  catch (_) { return null; }
+function getScenarios() {
+  try { return JSON.parse(localStorage.getItem('vyrl_scenarios') || '{}'); }
+  catch (_) { return {}; }
 }
 
-function saveSchedule() {
+function collectPlanSettings(enabled = false) {
   const custom = document.getElementById('custom-topic').value.trim();
   if (custom) { selTopic = custom; selTCtx = 'Freely selected user topic'; }
-  const time = document.getElementById('schedule-time').value;
-  if (!time) {
-    alert(currentLanguage === 'de' ? 'Bitte wähle eine Uhrzeit.' : 'Please choose a time.');
-    return;
-  }
-  const schedule = {
-    enabled: true,
-    time,
+  return {
+    enabled,
+    time: document.getElementById('schedule-time').value,
     zone: document.getElementById('schedule-zone').value,
     autoPublish: document.getElementById('auto-publish').checked,
     topic: selTopic,
@@ -1933,7 +2055,7 @@ function saveSchedule() {
     duration: document.getElementById('dur').value,
     format: document.getElementById('fmt').value,
     cta: document.getElementById('cta').value,
-    channels: selectedChannels,
+    channels: [...selectedChannels],
     audience: document.getElementById('audience').value,
     contentGoal: document.getElementById('content_goal').value,
     expertise: document.getElementById('expertise').value,
@@ -1948,8 +2070,109 @@ function saveSchedule() {
     ownLinks: document.getElementById('own_links').value,
     referenceLinks: document.getElementById('reference_links').value,
     contentStrategyContext,
-    lastRunKey: getSchedule()?.lastRunKey || ''
+    accountIds: {
+      facebookPageId: document.getElementById('fb_page_id')?.value.trim() || '',
+      instagramAccountId: document.getElementById('ig_acc')?.value.trim() || ''
+    },
+    updatedAt: new Date().toISOString()
   };
+}
+
+function renderScenarios(selectedId = '') {
+  const select = document.getElementById('scenario-select');
+  if (!select) return;
+  const scenarios = getScenarios();
+  const placeholder = currentLanguage === 'de' ? 'Gespeichertes Szenario wählen …' : 'Choose a saved scenario …';
+  select.innerHTML = `<option value="">${placeholder}</option>` +
+    Object.entries(scenarios)
+      .sort((a,b) => (b[1].updatedAt || '').localeCompare(a[1].updatedAt || ''))
+      .map(([id, item]) => `<option value="${escapeHtml(id)}">${escapeHtml(item.name)}</option>`)
+      .join('');
+  if (selectedId && scenarios[selectedId]) select.value = selectedId;
+}
+
+function setScenarioStatus(de, en) {
+  const el = document.getElementById('scenario-status');
+  if (el) el.textContent = currentLanguage === 'de' ? de : en;
+}
+
+function previewScenarioSelection() {
+  const id = document.getElementById('scenario-select')?.value;
+  const item = getScenarios()[id];
+  if (item) {
+    document.getElementById('scenario-name').value = item.name;
+    setScenarioStatus(`„${item.name}“ gewählt. Klicke auf „Laden & bearbeiten“.`, `“${item.name}” selected. Click “Load & edit”.`);
+  }
+}
+
+function saveScenario(forceNew = false) {
+  const nameInput = document.getElementById('scenario-name');
+  const name = nameInput.value.trim();
+  if (!name) {
+    alert(currentLanguage === 'de' ? 'Bitte gib dem Szenario einen Namen.' : 'Please give the scenario a name.');
+    nameInput.focus();
+    return;
+  }
+  const scenarios = getScenarios();
+  let id = forceNew ? '' : document.getElementById('scenario-select').value;
+  if (!id) id = `scenario_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+  scenarios[id] = { id, name, settings: collectPlanSettings(false), updatedAt: new Date().toISOString() };
+  localStorage.setItem('vyrl_scenarios', JSON.stringify(scenarios));
+  renderScenarios(id);
+  setScenarioStatus(`„${name}“ ist gespeichert und kann jederzeit geändert werden.`, `“${name}” is saved and can be edited anytime.`);
+}
+
+function loadScenario() {
+  const id = document.getElementById('scenario-select').value;
+  const item = getScenarios()[id];
+  if (!item) {
+    alert(currentLanguage === 'de' ? 'Bitte wähle zuerst ein Szenario.' : 'Please choose a scenario first.');
+    return;
+  }
+  applyScheduledSettings(item.settings || {});
+  document.getElementById('schedule-time').value = item.settings.time || '18:30';
+  document.getElementById('schedule-zone').value = item.settings.zone || 'local';
+  document.getElementById('auto-publish').checked = item.settings.autoPublish !== false;
+  document.getElementById('custom-topic').value = item.settings.topic || '';
+  if (document.getElementById('fb_page_id')) document.getElementById('fb_page_id').value = item.settings.accountIds?.facebookPageId || '';
+  if (document.getElementById('ig_acc')) document.getElementById('ig_acc').value = item.settings.accountIds?.instagramAccountId || '';
+  document.getElementById('scenario-name').value = item.name;
+  setScenarioStatus(`„${item.name}“ ist geladen. Ändern und erneut speichern.`, `“${item.name}” is loaded. Edit it and save again.`);
+}
+
+function newScenario() {
+  document.getElementById('scenario-select').value = '';
+  document.getElementById('scenario-name').value = '';
+  setScenarioStatus('Gib dem neuen Szenario einen Namen und speichere es.', 'Name the new scenario and save it.');
+  document.getElementById('scenario-name').focus();
+}
+
+function deleteScenario() {
+  const select = document.getElementById('scenario-select');
+  const id = select.value;
+  const scenarios = getScenarios();
+  if (!id || !scenarios[id]) return;
+  const name = scenarios[id].name;
+  if (!confirm(currentLanguage === 'de' ? `Szenario „${name}“ wirklich löschen?` : `Delete scenario “${name}”?`)) return;
+  delete scenarios[id];
+  localStorage.setItem('vyrl_scenarios', JSON.stringify(scenarios));
+  document.getElementById('scenario-name').value = '';
+  renderScenarios();
+  setScenarioStatus(`„${name}“ wurde gelöscht.`, `“${name}” was deleted.`);
+}
+
+function getSchedule() {
+  try { return JSON.parse(localStorage.getItem('vyrl_daily_schedule') || 'null'); }
+  catch (_) { return null; }
+}
+
+function saveSchedule() {
+  const time = document.getElementById('schedule-time').value;
+  if (!time) {
+    alert(currentLanguage === 'de' ? 'Bitte wähle eine Uhrzeit.' : 'Please choose a time.');
+    return;
+  }
+  const schedule = {...collectPlanSettings(true), time, lastRunKey: getSchedule()?.lastRunKey || ''};
   localStorage.setItem('vyrl_daily_schedule', JSON.stringify(schedule));
   if (hasNetlifyBackend()) {
     fetch('/api/schedule', {
@@ -2072,6 +2295,7 @@ window.addEventListener('load', () => {
   processOAuthCallback();
   configureDeploymentMode();
   setLanguage(currentLanguage);
+  renderScenarios();
   selectAIProvider(aiProvider);
   document.querySelectorAll('.quality-option').forEach(btn => btn.classList.toggle('active', btn.dataset.quality === qualityMode));
   renderChannels();
@@ -2102,14 +2326,45 @@ window.addEventListener('load', () => {
 
 function configureDeploymentMode() {
   if (!hasNetlifyBackend()) return;
-  document.querySelectorAll('#provider-claude, #provider-openrouter, [data-provider="claude"], #help-ai, #help-openrouter')
+  aiProvider = 'openrouter';
+  localStorage.setItem('vyrl_ai_provider', 'openrouter');
+  selectAIProvider('openrouter');
+  document.querySelectorAll('#provider-claude, [data-provider="claude"], #help-ai')
     .forEach(element => element?.classList.add('hidden'));
+  document.getElementById('provider-openrouter')?.classList.remove('hidden');
+  document.querySelectorAll('[data-provider="openrouter"]').forEach(element => element.classList.remove('hidden-provider'));
   const intro = document.querySelector('.connection-intro');
   if (intro) {
     intro.innerHTML = currentLanguage === 'de'
       ? '<strong>✅ Sichere Online-Version aktiv</strong><br>OpenRouter-Keys und Social-Tokens werden serverseitig verwaltet. Du musst hier keine geheimen Schlüssel einfügen.'
       : '<strong>✅ Secure online version active</strong><br>OpenRouter keys and social tokens are managed on the server. You do not need to enter secret keys here.';
   }
+  refreshConfigStatus();
+}
+
+async function refreshConfigStatus() {
+  if (!hasNetlifyBackend()) return;
+  try {
+    const response = await fetch('/api/config-status', {cache:'no-store', headers: backendHeaders()});
+    const status = await response.json();
+    document.getElementById('quick-key-card')?.classList.toggle('open', !status.serverOpenrouter);
+    const saved = getSessionOpenRouterKey();
+    syncOpenRouterKeyFields(saved);
+    const connectionStatus = document.getElementById('connection-key-status');
+    if (connectionStatus) {
+      connectionStatus.textContent = status.serverOpenrouter
+        ? (currentLanguage === 'de' ? '✓ Netlify-Key aktiv – auch der tägliche Autopilot kann ihn verwenden.' : '✓ Netlify key active – daily autopilot can use it too.')
+        : saved
+          ? (currentLanguage === 'de' ? '✓ Browser-Key aktiv – gilt für diesen Tab.' : '✓ Browser key active – valid for this tab.')
+          : (currentLanguage === 'de' ? 'Noch kein Key aktiv.' : 'No active key yet.');
+    }
+    if (saved) {
+      const input = document.getElementById('quick-openrouter-key');
+      if (input) input.value = saved;
+      const statusText = document.getElementById('quick-key-status');
+      if (statusText) statusText.textContent = currentLanguage === 'de' ? '✓ Sitzungsschlüssel aktiv.' : '✓ Session key active.';
+    }
+  } catch (_) {}
 }
 
 async function refreshBackendConnections() {
@@ -2120,6 +2375,27 @@ async function refreshBackendConnections() {
     localStorage.setItem('vyrl_oauth_connections', JSON.stringify(connections || {}));
     renderOAuthHub();
   } catch (_) {}
+}
+
+async function ensureOpenRouterConfigured() {
+  if (!hasNetlifyBackend()) return true;
+  try {
+    const response = await fetch('/api/config-status', {cache:'no-store', headers: backendHeaders()});
+    const status = await response.json();
+    if (!response.ok) throw new Error(status.error || 'Config check failed');
+    const quickKey = getSessionOpenRouterKey();
+    const card = document.getElementById('quick-key-card');
+    if (card) card.classList.toggle('open', !status.openrouter);
+    if (!status.openrouter && !quickKey) {
+      throw new Error(currentLanguage === 'de'
+        ? 'OpenRouter ist noch nicht eingerichtet. Trage den Key im sichtbaren Feld ein oder hinterlege OPENROUTER_API_KEY in Netlify.'
+        : 'OpenRouter is not configured yet. Enter the key in the visible field or add OPENROUTER_API_KEY in Netlify.');
+    }
+    return true;
+  } catch (error) {
+    alert(error.message);
+    return false;
+  }
 }
 
 function selectQuality(button) {
@@ -2424,6 +2700,7 @@ function cleanLinks(value) {
 }
 
 async function analyzeNiche() {
+  if (!(await ensureOpenRouterConfigured())) return;
   const openRouterKey = document.getElementById('openrouter_key').value.trim();
   const description = document.getElementById('niche_description').value.trim();
   const offer = document.getElementById('offer_description').value.trim();
@@ -2486,9 +2763,7 @@ Return valid JSON only with these keys:
     };
     const response = await fetch(hasNetlifyBackend() ? '/api/ai-content' : 'https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
-      headers: hasNetlifyBackend() ? {
-        'Content-Type': 'application/json'
-      } : {
+      headers: hasNetlifyBackend() ? backendHeaders() : {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer '+openRouterKey,
         'HTTP-Referer': location.origin === 'null' ? 'https://vyrl.app' : location.origin,
@@ -2738,9 +3013,7 @@ function chooseBestVideoModel(models) {
 }
 
 async function generateOpenRouterVideo(apiKey, prompt, requestedDuration) {
-  const headers = hasNetlifyBackend() ? {
-    'Content-Type': 'application/json'
-  } : {
+  const headers = hasNetlifyBackend() ? backendHeaders() : {
     'Authorization': 'Bearer '+apiKey,
     'Content-Type': 'application/json'
   };
@@ -2806,6 +3079,7 @@ async function generateOpenRouterVideo(apiKey, prompt, requestedDuration) {
 
 // MAIN RUN
 async function startRun(options = {}) {
+  if (!(await ensureOpenRouterConfigured())) return false;
   const { autoPublish = false, scheduled = false } = options;
   const dur = document.getElementById('dur').value;
   const fmt = document.getElementById('fmt').value;
@@ -2926,9 +3200,7 @@ SHARE:[0-100]`;
     };
     const resp = await fetch(hasNetlifyBackend() ? '/api/ai-content' : (isOpenRouter ? 'https://openrouter.ai/api/v1/chat/completions' : 'https://api.anthropic.com/v1/messages'), {
       method: 'POST',
-      headers: hasNetlifyBackend() ? {
-        'Content-Type': 'application/json'
-      } : isOpenRouter ? {
+      headers: hasNetlifyBackend() ? backendHeaders() : isOpenRouter ? {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer '+openRouterKey,
         'HTTP-Referer': location.origin === 'null' ? 'https://vyrl.app' : location.origin,
@@ -2950,7 +3222,14 @@ SHARE:[0-100]`;
         : { model: 'claude-sonnet-4-6', max_tokens: 2200, system: sys, messages: [{ role: 'user', content: 'Create one genuinely useful, specific content package. Run an internal quality critique before returning only the required format.' }] })
     });
     const data = await resp.json();
-    if (!resp.ok || data.error) throw new Error(data.error?.message || `${isOpenRouter ? 'OpenRouter' : 'Claude'} API error`);
+    if (!resp.ok || data.error) {
+      const detail = typeof data.error === 'string'
+        ? data.error
+        : (data.error?.message || data.message || '');
+      throw new Error(detail || (hasNetlifyBackend()
+        ? 'Netlify AI-Backend nicht erreichbar. Prüfe OPENROUTER_API_KEY und deploye erneut.'
+        : `${isOpenRouter ? 'OpenRouter' : 'Claude'} API error`));
+    }
     const raw = (hasNetlifyBackend() || isOpenRouter) ? (data.choices?.[0]?.message?.content || '') : (data.content?.[0]?.text || '');
     if (!raw) throw new Error('No content returned by the AI.');
 

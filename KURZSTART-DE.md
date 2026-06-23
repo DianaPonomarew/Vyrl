@@ -29,6 +29,15 @@ OPENROUTER_API_KEY
 
 Als Wert verwendest du deinen OpenRouter-Key. Danach erneut deployen.
 
+Wichtig: Das Speichern der Variable allein reicht nicht. Öffne anschließend **Deploys → Trigger deploy → Deploy site**.
+
+Falls im Generator ein API-Fehler erscheint, kontrolliere:
+
+1. Der Variablenname lautet exakt `OPENROUTER_API_KEY`.
+2. Der Wert beginnt normalerweise mit `sk-or-v1-`.
+3. Der Key besitzt Guthaben bzw. ein verfügbares Limit.
+4. Nach dem Eintragen wurde ein neuer Deploy gestartet.
+
 ## 4. Instagram und Facebook verbinden
 
 Du benötigst eine eigene Meta Developer App.

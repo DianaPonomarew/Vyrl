@@ -1,9 +1,9 @@
 import { json, openRouterHeaders } from "./_shared.mjs";
 
-export default async () => {
+export default async (request) => {
   try {
     const response = await fetch("https://openrouter.ai/api/v1/videos/models", {
-      headers: openRouterHeaders(),
+      headers: openRouterHeaders(request),
     });
     return json(await response.json(), response.status);
   } catch (error) {

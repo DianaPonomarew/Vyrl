@@ -31,6 +31,7 @@ OPENROUTER_API_KEY
 ```
 
 Add the OpenRouter key only in Netlify. Do not paste it into `index.html`.
+Trigger a fresh production deploy after adding or changing environment variables.
 
 ## Meta / Instagram setup
 
