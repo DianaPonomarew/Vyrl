@@ -1733,6 +1733,639 @@
     background: rgba(112,71,235,.14);
   }
 
+
+  /* ── INSTAGRAM TOKEN WIZARD ── */
+  .ig-wizard {
+    background: linear-gradient(135deg, #0F0B1A, #1A1235);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(201,255,82,.15);
+    box-shadow: 0 20px 50px rgba(10,5,25,.3);
+  }
+
+  .ig-wizard-steps {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 0;
+  }
+
+  .ig-step-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    color: rgba(255,255,255,.4);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    flex: 1;
+    transition: color .2s;
+  }
+
+  .ig-step-btn.active { color: #C9FF52; }
+  .ig-step-btn.done { color: rgba(255,255,255,.7); }
+
+  .ig-step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 900;
+    background: rgba(255,255,255,.08);
+    border: 1.5px solid rgba(255,255,255,.12);
+    transition: all .2s;
+  }
+
+  .ig-step-btn.active .ig-step-num {
+    background: #C9FF52;
+    color: #0F0B1A;
+    border-color: #C9FF52;
+    box-shadow: 0 0 16px rgba(201,255,82,.4);
+  }
+
+  .ig-step-btn.done .ig-step-num {
+    background: rgba(201,255,82,.2);
+    color: #C9FF52;
+    border-color: rgba(201,255,82,.4);
+  }
+
+  .ig-step-btn.done .ig-step-num::after {
+    content: '✓';
+  }
+
+  .ig-step-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,.1);
+    margin-bottom: 14px;
+    max-width: 32px;
+  }
+
+  .ig-wiz-panel { display: none; }
+  .ig-wiz-panel.active { display: block; }
+
+  .ig-wiz-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 16px;
+    letter-spacing: -.2px;
+  }
+
+  .ig-wiz-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .ig-wiz-check {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .ig-wiz-check > span:first-child {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 900;
+    background: rgba(201,255,82,.12);
+    color: #C9FF52;
+    flex: 0 0 auto;
+    border: 1px solid rgba(201,255,82,.2);
+  }
+
+  .ig-wiz-check > div strong {
+    display: block;
+    font-size: 11.5px;
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .ig-wiz-check > div small {
+    display: block;
+    font-size: 10px;
+    color: rgba(255,255,255,.55);
+    line-height: 1.5;
+  }
+
+  .ig-wiz-link {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #C9FF52;
+    text-decoration: none;
+  }
+
+  .ig-wiz-link:hover { text-decoration: underline; }
+
+  .ig-perm-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 6px 0 4px;
+  }
+
+  .ig-perm {
+    font-size: 9px;
+    font-weight: 800;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(112,71,235,.3);
+    color: #C4B5FD;
+    border: 1px solid rgba(112,71,235,.4);
+    letter-spacing: .02em;
+  }
+
+  .ig-code-block {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 10px;
+    color: #C9FF52;
+    margin: 6px 0 4px;
+    cursor: pointer;
+    transition: background .15s;
+    position: relative;
+  }
+
+  .ig-code-block:hover { background: rgba(255,255,255,.12); }
+
+  .ig-copy-hint {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 8px;
+    color: rgba(255,255,255,.35);
+    font-family: inherit;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .ig-wiz-next {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(100deg, #FF3FA4, #7947E9);
+    color: #fff;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity .15s, transform .15s;
+    letter-spacing: -.1px;
+  }
+
+  .ig-wiz-next:hover { opacity: .9; transform: translateY(-1px); }
+
+  .ig-wiz-verify {
+    background: linear-gradient(100deg, #059669, #047857);
+    margin-bottom: 10px;
+  }
+
+  .ig-wiz-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .ig-wiz-fields label {
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    color: rgba(255,255,255,.6);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: 5px;
+  }
+
+  .ig-wiz-fields input {
+    width: 100%;
+    padding: 11px 13px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.07) !important;
+    color: #fff !important;
+    font-size: 12px;
+    font-family: 'SF Mono', monospace;
+    outline: none;
+    transition: border-color .15s;
+  }
+
+  .ig-wiz-fields input:focus {
+    border-color: #C9FF52 !important;
+    box-shadow: 0 0 0 3px rgba(201,255,82,.12) !important;
+  }
+
+  .ig-wiz-fields input::placeholder { color: rgba(255,255,255,.25) !important; }
+
+  .ig-field-hint {
+    display: block;
+    font-size: 9px;
+    color: rgba(255,255,255,.4);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .ig-eye-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.07);
+    cursor: pointer;
+    font-size: 14px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    transition: background .15s;
+  }
+
+  .ig-eye-btn:hover { background: rgba(255,255,255,.14); }
+
+  .ig-verify-result {
+    padding: 0;
+    border-radius: 12px;
+    font-size: 11px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    display: none;
+  }
+
+  .ig-verify-result.ok {
+    display: block;
+    padding: 11px 13px;
+    background: rgba(5,150,105,.2);
+    border: 1px solid rgba(5,150,105,.4);
+    color: #6EE7B7;
+  }
+
+  .ig-verify-result.err {
+    display: block;
+    padding: 11px 13px;
+    background: rgba(239,68,68,.15);
+    border: 1px solid rgba(239,68,68,.3);
+    color: #FCA5A5;
+  }
+
+  .ig-token-note {
+    display: flex;
+    gap: 9px;
+    font-size: 9.5px;
+    color: rgba(255,255,255,.45);
+    line-height: 1.5;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+
+  .ig-token-note strong { color: rgba(255,255,255,.7); }
+
+
+  /* ── OAUTH CONNECT HERO ── */
+  .connect-hero {
+    margin-bottom: 12px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: linear-gradient(145deg, #0F0B1A 0%, #1C1240 100%);
+    border: 1px solid rgba(201,255,82,.15);
+    box-shadow: 0 20px 50px rgba(10,5,25,.35);
+  }
+
+  .connect-hero-inner {
+    padding: 28px 24px;
+    text-align: center;
+  }
+
+  .connect-hero-icon {
+    font-size: 44px;
+    margin-bottom: 14px;
+    filter: drop-shadow(0 8px 24px rgba(112,71,235,.3));
+  }
+
+  .connect-hero-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.5px;
+    margin-bottom: 8px;
+  }
+
+  .connect-hero-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,.55);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .connect-hero-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: none;
+    background: #1877F2;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background .15s, transform .15s, box-shadow .15s;
+    box-shadow: 0 8px 28px rgba(24,119,242,.35);
+    letter-spacing: -.1px;
+    margin-bottom: 16px;
+  }
+
+  .connect-hero-btn:hover {
+    background: #166FE5;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 38px rgba(24,119,242,.45);
+  }
+
+  .connect-fb-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    color: #1877F2;
+    font-size: 16px;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    font-family: Georgia, serif;
+  }
+
+  .connect-hero-trust {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 10px;
+    color: rgba(255,255,255,.38);
+    line-height: 1.5;
+    text-align: left;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,.04);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.06);
+  }
+
+  .connect-hero-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    text-align: left;
+    background: rgba(201,255,82,.07);
+    border: 1px solid rgba(201,255,82,.18);
+    border-radius: 14px;
+    padding: 13px 14px;
+    font-size: 11px;
+    color: rgba(255,255,255,.7);
+    line-height: 1.5;
+  }
+
+  .connect-hero-notice strong {
+    color: #C9FF52;
+  }
+
+  .connect-request-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #C9FF52;
+    text-decoration: none;
+    letter-spacing: .02em;
+  }
+
+  .connect-request-link:hover { text-decoration: underline; }
+
+  /* Connected state */
+  .connect-done-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+  }
+
+  .connect-done-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: #C9FF52;
+    margin-bottom: 8px;
+  }
+
+  .connect-done-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,.55);
+    margin-bottom: 18px;
+  }
+
+  .connect-done-switch {
+    background: none;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 10px;
+    padding: 8px 16px;
+    color: rgba(255,255,255,.5);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .15s;
+  }
+
+  .connect-done-switch:hover {
+    border-color: rgba(255,255,255,.4);
+    color: rgba(255,255,255,.8);
+  }
+
+  /* Manual fallback */
+  .manual-token-details {
+    margin-bottom: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(112,71,235,.12);
+    overflow: hidden;
+    background: rgba(255,255,255,.04);
+  }
+
+  .manual-token-details > summary {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255,255,255,.4);
+    list-style: none;
+    background: rgba(255,255,255,.03);
+    transition: color .15s;
+    user-select: none;
+  }
+
+  .manual-token-details > summary::-webkit-details-marker { display: none; }
+  .manual-token-details[open] > summary { color: rgba(255,255,255,.7); }
+  .manual-token-details > summary:hover { color: rgba(255,255,255,.6); }
+
+  .manual-token-body {
+    padding: 16px;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+
+  .manual-token-intro {
+    font-size: 11px;
+    color: rgba(255,255,255,.45);
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+
+  .manual-token-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .manual-token-field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    color: rgba(255,255,255,.55);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: 6px;
+  }
+
+  .manual-token-input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .manual-token-field input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.06) !important;
+    color: #fff !important;
+    font-family: 'SF Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color .15s;
+    flex: 1;
+  }
+
+  .manual-token-field input:focus {
+    border-color: rgba(201,255,82,.5) !important;
+    box-shadow: 0 0 0 3px rgba(201,255,82,.08) !important;
+  }
+
+  .manual-token-field input::placeholder {
+    color: rgba(255,255,255,.2) !important;
+    font-family: 'SF Mono', monospace;
+  }
+
+  .manual-token-hint {
+    display: block;
+    font-size: 9px;
+    color: rgba(255,255,255,.3);
+    margin-top: 5px;
+    font-family: 'SF Mono', monospace;
+    line-height: 1.4;
+  }
+
+  .manual-token-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #C9FF52;
+    text-decoration: none;
+  }
+
+  .manual-token-link:hover { text-decoration: underline; }
+
+  .manual-eye-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.06);
+    cursor: pointer;
+    font-size: 15px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    transition: background .15s;
+  }
+
+  .manual-eye-btn:hover { background: rgba(255,255,255,.12); }
+
+  .manual-verify-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(100deg, #059669, #047857);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity .15s, transform .15s;
+    margin-bottom: 8px;
+  }
+
+  .manual-verify-btn:hover { opacity: .9; transform: translateY(-1px); }
+
+  .ig-verify-result {
+    border-radius: 10px;
+    font-size: 11px;
+    line-height: 1.5;
+    padding: 0;
+    display: none;
+  }
+
+  .ig-verify-result.ok {
+    display: block;
+    padding: 11px 13px;
+    background: rgba(5,150,105,.2);
+    border: 1px solid rgba(5,150,105,.4);
+    color: #6EE7B7;
+    border-radius: 10px;
+  }
+
+  .ig-verify-result.err {
+    display: block;
+    padding: 11px 13px;
+    background: rgba(239,68,68,.15);
+    border: 1px solid rgba(239,68,68,.3);
+    color: #FCA5A5;
+    border-radius: 10px;
+  }
+
   /* ── PLAN PRIMARY CARD (Step 2) ── */
   .plan-primary-card {
     background: linear-gradient(145deg, rgba(255,255,255,.94), rgba(248,244,255,.92));
@@ -2301,161 +2934,88 @@
           </div>
 
           <span class="provider-label" data-de="2. Social-Konten verbinden" data-en="2. Connect social accounts">2. Social-Konten verbinden</span>
-          <div class="oauth-hub">
-            <div class="oauth-hub-head">
-              <span>
-                <strong data-de="Ein-Klick-Login (empfohlen)" data-en="One-click login (recommended)">Ein-Klick-Login (empfohlen)</strong>
-                <small data-de="Einloggen, Zugriff erlauben, fertig. vyrl erkennt Konten automatisch." data-en="Sign in, allow access, done. vyrl detects accounts automatically.">Einloggen, Zugriff erlauben, fertig. vyrl erkennt Konten automatisch.</small>
-              </span>
-              <span class="easy-badge">EMPFOHLEN</span>
+
+          <!-- ── BIG OAUTH CONNECT BUTTON ── -->
+          <div class="connect-hero">
+            <div class="connect-hero-inner" id="connect-status-area">
+              <!-- State: not connected -->
+              <div id="connect-state-idle">
+                <div class="connect-hero-icon">📸</div>
+                <div class="connect-hero-title" data-de="Instagram verbinden" data-en="Connect Instagram">Instagram verbinden</div>
+                <div class="connect-hero-sub" data-de="Einmal einloggen — vyrl darf dann automatisch posten." data-en="Log in once — vyrl can then post automatically.">Einmal einloggen — vyrl darf dann automatisch posten.</div>
+                <button class="connect-hero-btn" type="button" onclick="startSocialConnect('meta')" id="btn-connect-meta">
+                  <span class="connect-fb-icon">f</span>
+                  <span data-de="Mit Facebook / Instagram einloggen" data-en="Log in with Facebook / Instagram">Mit Facebook / Instagram einloggen</span>
+                </button>
+                <div class="connect-hero-trust">
+                  <span>🔒</span>
+                  <span data-de="Deine Login-Daten gehen direkt zu Meta. vyrl sieht nur das Access-Token — gespeichert auf dem Server, nie im Browser." data-en="Your login goes directly to Meta. vyrl only sees the access token — stored on the server, never in the browser.">Deine Login-Daten gehen direkt zu Meta. vyrl sieht nur das Access-Token — gespeichert auf dem Server, nie im Browser.</span>
+                </div>
+                <div class="connect-hero-notice">
+                  <span>ℹ️</span>
+                  <div>
+                    <strong data-de="Du musst als Tester eingetragen sein" data-en="You need to be added as a tester">Du musst als Tester eingetragen sein</strong>
+                    <span data-de=" — einmalige Einladung per E-Mail von NEXORA. Danach funktioniert der Login sofort." data-en=" — one-time email invitation from NEXORA. After that the login works immediately."> — einmalige Einladung per E-Mail von NEXORA. Danach funktioniert der Login sofort.</span>
+                    <a href="mailto:mail.ai.nexora@gmail.com?subject=vyrl%20Tester-Zugang&body=Hallo%2C%20ich%20m%C3%B6chte%20als%20Tester%20f%C3%BCr%20vyrl%20eingetragen%20werden." class="connect-request-link" data-de="Zugang anfragen →" data-en="Request access →">Zugang anfragen →</a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- State: connected -->
+              <div id="connect-state-done" style="display:none;">
+                <div class="connect-done-icon">✅</div>
+                <div class="connect-done-name" id="connect-done-name">@deinaccount</div>
+                <div class="connect-done-sub" data-de="Instagram ist verbunden. vyrl kann jetzt automatisch posten." data-en="Instagram is connected. vyrl can now post automatically.">Instagram ist verbunden. vyrl kann jetzt automatisch posten.</div>
+                <button class="connect-done-switch" type="button" onclick="switchInstagramAccount()" data-de="Anderen Account verbinden" data-en="Switch account">Anderen Account verbinden</button>
+              </div>
             </div>
-            <div class="oauth-list" id="oauth-list"></div>
-            <div class="oauth-note" data-de="Tokens bleiben auf dem Server und werden automatisch erneuert." data-en="Tokens stay on the server and are refreshed automatically.">Tokens bleiben auf dem Server und werden automatisch erneuert.</div>
-            <button type="button" class="more-channels" style="color:#D7FF75;text-align:left;padding-left:0;" onclick="toggleManualConnect()" id="manual-connect-btn" data-de="Manuelle Einrichtung anzeigen" data-en="Show manual setup">Manuelle Einrichtung anzeigen</button>
           </div>
 
-          <div class="key-grid">
-            <div class="key-item provider-field" data-provider="claude">
-              <div class="key-label-row"><label>Claude API Key</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-ai',this)" aria-label="Claude API Key Hilfe">?</button></div>
-              <input type="password" id="ai_key" placeholder="sk-ant-...">
-            </div>
-            <div class="key-item provider-field hidden-provider" data-provider="openrouter">
-              <div class="key-label-row"><label>OpenRouter Key</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-openrouter',this)" aria-label="OpenRouter Key Hilfe">?</button></div>
-              <input type="password" id="openrouter_key" placeholder="sk-or-v1-...">
-            </div>
-            <div class="key-item provider-field hidden-provider" data-provider="openrouter">
-              <div class="key-label-row"><label data-de="KI-Modell" data-en="AI model">KI-Modell</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-model',this)">?</button></div>
-              <select id="openrouter_model">
-                <option value="openrouter/auto" data-de="✨ Automatisch" data-en="✨ Automatic">✨ Automatisch</option>
-                <option value="~anthropic/claude-sonnet-latest">Claude Sonnet</option>
-                <option value="~openai/gpt-latest">GPT Latest</option>
-                <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
-              </select>
-            </div>
-            <div class="video-engine-box provider-field hidden-provider" data-provider="openrouter" style="grid-column:1/-1;">
-              <div class="video-engine-head">
-                <strong data-de="🎬 Video-Generator: automatisch" data-en="🎬 Video generator: automatic">🎬 Video-Generator: automatisch</strong>
-                <span>OPENROUTER VIDEO</span>
-              </div>
-              <p data-de="vyrl wählt automatisch das beste verfügbare Videomodell (9:16, passend zum Qualitätsmodus)." data-en="vyrl automatically selects the best available video model (9:16, matching your quality mode).">vyrl wählt automatisch das beste verfügbare Videomodell (9:16, passend zum Qualitätsmodus).</p>
-            </div>
+          <!-- ── MANUAL TOKEN FALLBACK (collapsed) ── -->
+          <details class="manual-token-details">
+            <summary data-de="🔧 Manuell einrichten (für Entwickler)" data-en="🔧 Manual setup (for developers)">🔧 Manuell einrichten (für Entwickler)</summary>
+            <div class="manual-token-body">
+              <p class="manual-token-intro" data-de="Nur nötig wenn der Login-Button nicht funktioniert. Du brauchst einen Access Token aus dem Meta Graph API Explorer." data-en="Only needed if the login button doesn't work. You need an access token from the Meta Graph API Explorer.">Nur nötig wenn der Login-Button nicht funktioniert. Du brauchst einen Access Token aus dem Meta Graph API Explorer.</p>
 
-            <div class="key-help" id="help-ai">
-              <strong data-de="Claude API Key holen" data-en="Get your Claude API key">Claude API Key holen</strong>
-              <ol>
-                <li data-de="Öffne platform.claude.com und melde dich an." data-en="Open platform.claude.com and sign in.">Öffne platform.claude.com und melde dich an.</li>
-                <li data-de="Klicke auf „Create Key", Name z. B. „vyrl"." data-en="Click "Create Key", name it e.g. "vyrl".">Klicke auf „Create Key", Name z. B. „vyrl".</li>
-                <li data-de="Key sofort kopieren und oben einfügen." data-en="Copy immediately and paste above.">Key sofort kopieren und oben einfügen.</li>
-              </ol>
-              <a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener" data-de="Claude Keys öffnen ↗" data-en="Open Claude Keys ↗">Claude Keys öffnen ↗</a>
-            </div>
-            <div class="key-help" id="help-openrouter">
-              <strong data-de="OpenRouter Key holen" data-en="Get your OpenRouter key">OpenRouter Key holen</strong>
-              <ol>
-                <li data-de="openrouter.ai → kostenloses Konto erstellen." data-en="openrouter.ai → create a free account.">openrouter.ai → kostenloses Konto erstellen.</li>
-                <li data-de="„Keys" → „Create Key" → kopieren." data-en=""Keys" → "Create Key" → copy.">"Keys" → „Create Key" → kopieren.</li>
-              </ol>
-              <a href="https://openrouter.ai/settings/keys" target="_blank" rel="noopener" data-de="OpenRouter Keys ↗" data-en="OpenRouter Keys ↗">OpenRouter Keys ↗</a>
-            </div>
-            <div class="key-help" id="help-model">
-              <strong data-de="Modell auswählen" data-en="Choose a model">Modell auswählen</strong>
-              <span data-de="„Automatisch" ist der beste Start. Du kannst später Claude, GPT oder Gemini wählen." data-en=""Automatic" is the best start. You can switch to Claude, GPT or Gemini later.">"Automatisch" ist der beste Start.</span>
-            </div>
+              <div class="manual-token-fields">
+                <div class="manual-token-field">
+                  <label data-de="Instagram Access Token" data-en="Instagram Access Token">Instagram Access Token</label>
+                  <div class="manual-token-input-row">
+                    <input type="password" id="ig_tok" placeholder="EAABsb..." autocomplete="off">
+                    <button type="button" class="manual-eye-btn" onclick="toggleIgTokenVisibility()" title="Anzeigen">👁</button>
+                  </div>
+                  <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener" class="manual-token-link" data-de="Token holen (Graph API Explorer) ↗" data-en="Get token (Graph API Explorer) ↗">Token holen (Graph API Explorer) ↗</a>
+                </div>
+                <div class="manual-token-field">
+                  <label>Instagram Account ID</label>
+                  <input type="text" id="ig_acc" placeholder="17841404450011038">
+                  <small class="manual-token-hint" data-de='Graph API Explorer → me/accounts?fields=instagram_business_account → "id" kopieren' data-en='Graph API Explorer → me/accounts?fields=instagram_business_account → copy "id"'>Graph API Explorer → me/accounts?fields=instagram_business_account → "id" kopieren</small>
+                </div>
+              </div>
 
-            <!-- Instagram manual credentials -->
-            <div class="key-item channel-credential" data-channel-credential="instagram">
-              <div class="key-label-row"><label>Instagram Token</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-ig',this)">?</button></div>
-              <input type="password" id="ig_tok" placeholder="EAABsb...">
+              <button type="button" class="manual-verify-btn" onclick="verifyInstagramConnection()" id="ig-verify-btn">
+                <span data-de="✓ Verbindung testen" data-en="✓ Test connection">✓ Verbindung testen</span>
+              </button>
+              <div class="ig-verify-result" id="ig-verify-result"></div>
             </div>
-            <div class="key-help channel-credential" data-channel-credential="instagram" id="help-ig">
-              <strong data-de="Instagram Token holen" data-en="Get your Instagram token">Instagram Token holen</strong>
-              <ol>
-                <li data-de="Instagram muss ein Professional-Konto sein, verknüpft mit einer Facebook-Seite." data-en="Instagram must be a Professional account linked to a Facebook Page.">Instagram muss ein Professional-Konto sein, verknüpft mit einer Facebook-Seite.</li>
-                <li data-de="Meta for Developers: App erstellen, Instagram API einrichten." data-en="Meta for Developers: create an app, set up the Instagram API.">Meta for Developers: App erstellen, Instagram API einrichten.</li>
-                <li data-de="Token benötigt Berechtigung zum Veröffentlichen." data-en="Token needs publish permission.">Token benötigt Berechtigung zum Veröffentlichen.</li>
-              </ol>
-              <a href="https://developers.facebook.com/docs/instagram-platform/content-publishing" target="_blank" rel="noopener">Instagram API Docs ↗</a>
-            </div>
-            <div class="key-item channel-credential" data-channel-credential="instagram">
-              <div class="key-label-row"><label>Instagram Account ID</label><button class="help-toggle" type="button" onclick="toggleKeyHelp('help-id',this)">?</button></div>
-              <input type="text" id="ig_acc" placeholder="17841...">
-            </div>
-            <div class="key-help channel-credential" data-channel-credential="instagram" id="help-id">
-              <strong data-de="Account ID finden" data-en="Find account ID">Account ID finden</strong>
-              <ol>
-                <li data-de="Meta Graph API Explorer öffnen." data-en="Open Meta Graph API Explorer.">Meta Graph API Explorer öffnen.</li>
-                <li data-de="Facebook-Seiten abrufen → Feld „instagram_business_account" → ID kopieren." data-en="Fetch Facebook Pages → field "instagram_business_account" → copy the ID.">Facebook-Seiten → „instagram_business_account" → ID kopieren.</li>
-              </ol>
-              <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener">Graph API Explorer ↗</a>
-            </div>
+          </details>
 
-            <!-- Other platform connections -->
-            <div class="platform-connections">
-              <div class="platform-connect-card" data-platform-connect="tiktok">
-                <div class="connect-head">
-                  <div class="connect-title"><span>🎵</span><span><strong>TikTok</strong><small data-de="Für automatische Kurzvideos" data-en="For automatic short videos">Für automatische Kurzvideos</small></span></div>
-                  <span class="connect-state" data-de="EINRICHTUNG NÖTIG" data-en="SETUP NEEDED">EINRICHTUNG NÖTIG</span>
-                </div>
-                <div class="connect-fields">
-                  <div class="connect-field connect-wide"><label>User Access Token</label><input type="password" id="tiktok_token" placeholder="act...."></div>
-                  <div class="connect-field"><label>Open ID</label><input type="text" id="tiktok_open_id" placeholder="user_open_id"></div>
-                  <div class="connect-field"><label data-de="Modus" data-en="Mode">Modus</label><select id="tiktok_mode"><option value="direct" data-de="Direkt posten" data-en="Direct post">Direkt posten</option><option value="inbox" data-de="An Inbox senden" data-en="Send to inbox">An Inbox senden</option></select></div>
-                </div>
-                <div class="connect-note"><a href="https://developers.tiktok.com/products/content-posting-api/" target="_blank" rel="noopener">TikTok Content Posting API ↗</a></div>
-              </div>
-              <div class="platform-connect-card" data-platform-connect="facebook">
-                <div class="connect-head">
-                  <div class="connect-title"><span>👥</span><span><strong>Facebook Page</strong><small data-de="Posts & Reels" data-en="Posts & reels">Posts & Reels</small></span></div>
-                  <span class="connect-state" data-de="EINRICHTUNG NÖTIG" data-en="SETUP NEEDED">EINRICHTUNG NÖTIG</span>
-                </div>
-                <div class="connect-fields">
-                  <div class="connect-field"><label>Page ID</label><input type="text" id="fb_page_id" placeholder="123456789..."></div>
-                  <div class="connect-field"><label>Page Access Token</label><input type="password" id="fb_page_token" placeholder="EAAB..."></div>
-                </div>
-                <div class="connect-note"><a href="https://developers.facebook.com/docs/pages-api/posts/" target="_blank" rel="noopener">Facebook Pages API ↗</a></div>
-              </div>
-              <div class="platform-connect-card" data-platform-connect="linkedin">
-                <div class="connect-head">
-                  <div class="connect-title"><span>💼</span><span><strong>LinkedIn</strong><small data-de="Profil oder Unternehmensseite" data-en="Profile or organization">Profil oder Unternehmensseite</small></span></div>
-                  <span class="connect-state" data-de="EINRICHTUNG NÖTIG" data-en="SETUP NEEDED">EINRICHTUNG NÖTIG</span>
-                </div>
-                <div class="connect-fields">
-                  <div class="connect-field connect-wide"><label>Access Token</label><input type="password" id="linkedin_token"></div>
-                  <div class="connect-field"><label data-de="Autor-URN" data-en="Author URN">Autor-URN</label><input type="text" id="linkedin_author" placeholder="urn:li:person:..."></div>
-                  <div class="connect-field"><label data-de="Posten als" data-en="Post as">Posten als</label><select id="linkedin_type"><option value="person" data-de="Persönlich" data-en="Personal">Persönlich</option><option value="organization" data-de="Unternehmen" data-en="Organization">Unternehmen</option></select></div>
-                </div>
-              </div>
-              <div class="platform-connect-card" data-platform-connect="x">
-                <div class="connect-head">
-                  <div class="connect-title"><span>𝕏</span><span><strong>X (Twitter)</strong><small data-de="Posts & Video" data-en="Posts & video">Posts & Video</small></span></div>
-                  <span class="connect-state" data-de="EINRICHTUNG NÖTIG" data-en="SETUP NEEDED">EINRICHTUNG NÖTIG</span>
-                </div>
-                <div class="connect-fields">
-                  <div class="connect-field connect-wide"><label>OAuth User Access Token</label><input type="password" id="x_access_token"></div>
-                  <div class="connect-field connect-wide"><label data-de="User ID (optional)" data-en="User ID (optional)">User ID (optional)</label><input type="text" id="x_user_id"></div>
-                </div>
-              </div>
-              <div class="platform-connect-card" data-platform-connect="youtube">
-                <div class="connect-head">
-                  <div class="connect-title"><span>▶️</span><span><strong>YouTube Shorts</strong><small data-de="Via YouTube-Kanal" data-en="Via YouTube channel">Via YouTube-Kanal</small></span></div>
-                  <span class="connect-state" data-de="OAUTH NÖTIG" data-en="OAUTH NEEDED">OAUTH NÖTIG</span>
-                </div>
-                <div class="connect-fields">
-                  <div class="connect-field"><label>Channel ID</label><input type="text" id="youtube_channel_id"></div>
-                  <div class="connect-field"><label>Refresh Token</label><input type="password" id="youtube_refresh_token"></div>
-                </div>
-              </div>
-              <div class="platform-connect-card" data-platform-connect="threads">
-                <div class="connect-head">
-                  <div class="connect-title"><span>🧵</span><span><strong>Threads</strong><small data-de="Text- & Video-Posts" data-en="Text & video posts">Text- & Video-Posts</small></span></div>
-                  <span class="connect-state" data-de="EINRICHTUNG NÖTIG" data-en="SETUP NEEDED">EINRICHTUNG NÖTIG</span>
-                </div>
-                <div class="connect-fields">
-                  <div class="connect-field"><label>User ID</label><input type="text" id="threads_user_id"></div>
-                  <div class="connect-field"><label>Access Token</label><input type="password" id="threads_token"></div>
-                </div>
-              </div>
-            </div>
+          <!-- hidden fields for other platforms (still used by JS) -->
+          <div style="display:none;">
+            <input type="text" id="fb_page_id">
+            <input type="password" id="fb_page_token">
+            <input type="password" id="linkedin_token">
+            <input type="text" id="linkedin_author">
+            <select id="linkedin_type"><option value="person">person</option><option value="organization">organization</option></select>
+            <input type="password" id="x_access_token">
+            <input type="text" id="x_user_id">
+            <input type="text" id="youtube_channel_id">
+            <input type="password" id="youtube_refresh_token">
+            <input type="text" id="threads_user_id">
+            <input type="password" id="threads_token">
+            <input type="password" id="tiktok_token">
+            <input type="text" id="tiktok_open_id">
+            <select id="tiktok_mode"><option value="direct">direct</option><option value="inbox">inbox</option></select>
           </div>
 
           <div class="safety-strip">
@@ -3066,6 +3626,7 @@ async function schedulerTick() {
 setInterval(schedulerTick, 15000);
 window.addEventListener('load', () => {
   processOAuthCallback();
+  checkExistingInstagramConnection();
   configureDeploymentMode();
   setLanguage(currentLanguage);
   renderScenarios();
@@ -3302,9 +3863,10 @@ function processOAuthCallback() {
   const params = new URLSearchParams(location.search);
   const connected = params.get('oauth_connected');
   if (!connected) return;
+  const accountName = params.get('account_name') || (currentLanguage === 'de' ? 'Konto verbunden' : 'Account connected');
   const connections = oauthConnections();
   connections[connected] = {
-    account: params.get('account_name') || (currentLanguage === 'de' ? 'Konto verbunden' : 'Account connected'),
+    account: accountName,
     connectedAt: new Date().toISOString()
   };
   localStorage.setItem('vyrl_oauth_connections', JSON.stringify(connections));
@@ -3312,6 +3874,31 @@ function processOAuthCallback() {
   params.delete('account_name');
   const query = params.toString();
   history.replaceState({}, '', location.pathname + (query ? '?'+query : '') + location.hash);
+  // Show connected state in UI
+  if (connected === 'meta') showInstagramConnected(accountName);
+}
+
+function showInstagramConnected(accountName) {
+  const idle = document.getElementById('connect-state-idle');
+  const done = document.getElementById('connect-state-done');
+  const nameEl = document.getElementById('connect-done-name');
+  if (idle) idle.style.display = 'none';
+  if (done) done.style.display = 'block';
+  if (nameEl) nameEl.textContent = accountName.startsWith('@') ? accountName : '@' + accountName;
+}
+
+function switchInstagramAccount() {
+  const idle = document.getElementById('connect-state-idle');
+  const done = document.getElementById('connect-state-done');
+  if (idle) idle.style.display = 'block';
+  if (done) done.style.display = 'none';
+}
+
+function checkExistingInstagramConnection() {
+  const connections = oauthConnections();
+  if (connections.meta?.account) {
+    showInstagramConnected(connections.meta.account);
+  }
 }
 
 function toggleChannel(button) {
@@ -4239,6 +4826,91 @@ async function publishInstagramViaBackend(url) {
     return false;
   }
 }
+// ── INSTAGRAM WIZARD ──
+function igWizStep(step) {
+  // Update panels
+  for (let i = 1; i <= 4; i++) {
+    const panel = document.getElementById('igwiz-' + i);
+    const btn = document.getElementById('igwiz-btn-' + i);
+    if (!panel || !btn) continue;
+    panel.classList.toggle('active', i === step);
+    btn.classList.remove('active', 'done');
+    if (i === step) btn.classList.add('active');
+    else if (i < step) btn.classList.add('done');
+  }
+}
+
+function copyCode(el) {
+  const text = el.childNodes[0].textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const hint = el.querySelector('.ig-copy-hint');
+    if (hint) {
+      hint.textContent = currentLanguage === 'de' ? '✓ Kopiert!' : '✓ Copied!';
+      setTimeout(() => { hint.textContent = currentLanguage === 'de' ? 'klicken zum Kopieren' : 'click to copy'; }, 2000);
+    }
+  });
+}
+
+function toggleIgTokenVisibility() {
+  const field = document.getElementById('ig_tok');
+  if (field) field.type = field.type === 'password' ? 'text' : 'password';
+}
+
+async function verifyInstagramConnection() {
+  const token = document.getElementById('ig_tok')?.value.trim();
+  const accountId = document.getElementById('ig_acc')?.value.trim();
+  const result = document.getElementById('ig-verify-result');
+  const btn = document.getElementById('ig-verify-btn');
+  const de = currentLanguage === 'de';
+
+  if (!token || !accountId) {
+    result.className = 'ig-verify-result err';
+    result.textContent = de ? 'Bitte erst Token und Account-ID eintragen.' : 'Please enter token and account ID first.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span>' + (de ? 'Teste Verbindung...' : 'Testing connection...');
+  result.className = 'ig-verify-result';
+
+  try {
+    // Test: fetch basic account info
+    const resp = await fetch(
+      `https://graph.instagram.com/v21.0/${accountId}?fields=id,username,account_type&access_token=${encodeURIComponent(token)}`
+    );
+    const data = await resp.json();
+
+    if (data.error) {
+      const code = data.error.code;
+      let msg = data.error.message;
+      if (code === 190) msg = de ? '❌ Token ungültig oder abgelaufen. Neuen Token aus dem Graph API Explorer holen.' : '❌ Token invalid or expired. Get a new token from the Graph API Explorer.';
+      else if (code === 10 || /permission/i.test(msg)) msg = de ? '❌ Fehlende Berechtigung. Sicherstellen dass instagram_basic im Token enthalten ist.' : '❌ Missing permission. Make sure instagram_basic is included in the token.';
+      else if (code === 100) msg = de ? '❌ Account-ID falsch. Prüfe ob du die instagram_business_account ID (nicht die Facebook-Seiten-ID) eingetragen hast.' : '❌ Wrong account ID. Make sure you used the instagram_business_account ID (not the Facebook Page ID).';
+      result.className = 'ig-verify-result err';
+      result.textContent = msg;
+    } else {
+      // Save to session so publish step picks them up
+      sessionStorage.setItem('vyrl_session_ig_token', token);
+      sessionStorage.setItem('vyrl_session_ig_account', accountId);
+      igToken = token;
+      igAccountId = accountId;
+      result.className = 'ig-verify-result ok';
+      result.innerHTML = (de ? `✅ Verbunden mit @${data.username || accountId}` : `✅ Connected as @${data.username || accountId}`) +
+        (data.account_type ? ` · ${data.account_type}` : '') +
+        '<br>' + (de ? 'vyrl kann jetzt auf diesem Account posten.' : 'vyrl can now post to this account.');
+    }
+  } catch (e) {
+    result.className = 'ig-verify-result err';
+    result.textContent = de
+      ? '❌ Verbindung fehlgeschlagen. Prüfe deine Internetverbindung.'
+      : '❌ Connection failed. Check your internet connection.';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span data-de="✓ Verbindung testen" data-en="✓ Test connection">' + (de ? '✓ Verbindung testen' : '✓ Test connection') + '</span>';
+}
+
+
 </script>
 </body>
 </html>
