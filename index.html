@@ -2205,142 +2205,220 @@
   }
 
   /* Manual fallback */
+  /* ── MANUAL TOKEN FALLBACK ── */
   .manual-token-details {
-    margin-bottom: 12px;
-    border-radius: 14px;
-    border: 1px solid rgba(112,71,235,.12);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.08);
     overflow: hidden;
-    background: rgba(255,255,255,.04);
+    background: rgba(255,255,255,.03);
+    margin-top: 10px;
   }
 
   .manual-token-details > summary {
-    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
     cursor: pointer;
-    font-size: 11px;
-    font-weight: 700;
-    color: rgba(255,255,255,.4);
     list-style: none;
-    background: rgba(255,255,255,.03);
-    transition: color .15s;
+    transition: background .15s;
     user-select: none;
   }
 
   .manual-token-details > summary::-webkit-details-marker { display: none; }
-  .manual-token-details[open] > summary { color: rgba(255,255,255,.7); }
-  .manual-token-details > summary:hover { color: rgba(255,255,255,.6); }
+  .manual-token-details > summary:hover { background: rgba(255,255,255,.04); }
+  .manual-token-details[open] > summary { background: rgba(255,255,255,.05); }
 
-  .manual-token-body {
-    padding: 16px;
-    border-top: 1px solid rgba(255,255,255,.06);
+  .manual-summary-icon { font-size: 16px; flex: 0 0 auto; }
+
+  .manual-summary-title {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255,255,255,.55);
   }
 
-  .manual-token-intro {
-    font-size: 11px;
-    color: rgba(255,255,255,.45);
-    line-height: 1.55;
-    margin-bottom: 14px;
-  }
+  .manual-token-details[open] .manual-summary-title { color: rgba(255,255,255,.8); }
 
-  .manual-token-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-
-  .manual-token-field label {
+  .manual-summary-sub {
     display: block;
     font-size: 10px;
-    font-weight: 800;
-    color: rgba(255,255,255,.55);
-    text-transform: uppercase;
+    color: rgba(255,255,255,.28);
+    margin-top: 1px;
+  }
+
+  .manual-summary-arrow {
+    margin-left: auto;
+    font-size: 18px;
+    color: rgba(255,255,255,.25);
+    transition: transform .2s;
+    line-height: 1;
+  }
+
+  .manual-token-details[open] .manual-summary-arrow { transform: rotate(90deg); }
+
+  .manual-token-body {
+    padding: 18px 16px 16px;
+    border-top: 1px solid rgba(255,255,255,.06);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .manual-step-hint {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 11px;
+    color: rgba(255,255,255,.5);
+    line-height: 1.6;
+  }
+
+  .manual-step-hint a {
+    color: #C9FF52;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .manual-step-hint a:hover { text-decoration: underline; }
+
+  .manual-step-badge {
+    display: inline-block;
+    background: rgba(201,255,82,.15);
+    color: #C9FF52;
+    font-size: 9px;
+    font-weight: 900;
     letter-spacing: .08em;
-    margin-bottom: 6px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .manual-perms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+  }
+
+  .manual-perms code {
+    font-size: 9.5px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(112,71,235,.25);
+    color: #C4B5FD;
+    border: 1px solid rgba(112,71,235,.35);
+  }
+
+  .manual-inline-code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 10px;
+    background: rgba(201,255,82,.1);
+    color: #C9FF52;
+    padding: 1px 6px;
+    border-radius: 5px;
+    border: 1px solid rgba(201,255,82,.2);
+    cursor: pointer;
+    transition: background .15s;
+  }
+
+  .manual-inline-code:hover { background: rgba(201,255,82,.18); }
+
+  .manual-field-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .manual-field-label {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .manual-field-label > span:first-child {
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.2px;
+  }
+
+  .manual-field-note {
+    font-size: 10px;
+    color: rgba(255,255,255,.35);
+    font-weight: 400;
   }
 
   .manual-token-input-row {
     display: flex;
     gap: 8px;
+    align-items: stretch;
   }
 
-  .manual-token-field input {
+  .manual-big-input {
     width: 100%;
-    padding: 12px 14px;
-    border-radius: 12px;
-    border: 1.5px solid rgba(255,255,255,.1);
+    padding: 14px 16px !important;
+    border-radius: 14px !important;
+    border: 2px solid rgba(255,255,255,.12) !important;
     background: rgba(255,255,255,.06) !important;
     color: #fff !important;
-    font-family: 'SF Mono', monospace;
-    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace !important;
+    font-size: 13px !important;
     outline: none;
-    transition: border-color .15s;
+    transition: border-color .15s, box-shadow .15s;
     flex: 1;
   }
 
-  .manual-token-field input:focus {
-    border-color: rgba(201,255,82,.5) !important;
-    box-shadow: 0 0 0 3px rgba(201,255,82,.08) !important;
+  .manual-big-input:focus {
+    border-color: rgba(201,255,82,.6) !important;
+    box-shadow: 0 0 0 3px rgba(201,255,82,.1) !important;
   }
 
-  .manual-token-field input::placeholder {
+  .manual-big-input::placeholder {
     color: rgba(255,255,255,.2) !important;
-    font-family: 'SF Mono', monospace;
+    font-family: 'SF Mono', monospace !important;
   }
-
-  .manual-token-hint {
-    display: block;
-    font-size: 9px;
-    color: rgba(255,255,255,.3);
-    margin-top: 5px;
-    font-family: 'SF Mono', monospace;
-    line-height: 1.4;
-  }
-
-  .manual-token-link {
-    display: inline-block;
-    margin-top: 6px;
-    font-size: 10px;
-    font-weight: 700;
-    color: #C9FF52;
-    text-decoration: none;
-  }
-
-  .manual-token-link:hover { text-decoration: underline; }
 
   .manual-eye-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    border: 1.5px solid rgba(255,255,255,.1);
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    border: 2px solid rgba(255,255,255,.1);
     background: rgba(255,255,255,.06);
     cursor: pointer;
-    font-size: 15px;
+    font-size: 18px;
     display: grid;
     place-items: center;
     flex: 0 0 auto;
-    transition: background .15s;
+    transition: background .15s, border-color .15s;
+    align-self: flex-start;
   }
 
-  .manual-eye-btn:hover { background: rgba(255,255,255,.12); }
+  .manual-eye-btn:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.2); }
 
   .manual-verify-btn {
     width: 100%;
-    padding: 12px;
-    border-radius: 12px;
+    padding: 15px;
+    border-radius: 14px;
     border: none;
     background: linear-gradient(100deg, #059669, #047857);
     color: #fff;
-    font-family: inherit;
-    font-size: 13px;
+    font-family: 'Inter', inherit;
+    font-size: 14px;
     font-weight: 800;
     cursor: pointer;
     transition: opacity .15s, transform .15s;
-    margin-bottom: 8px;
+    letter-spacing: -.1px;
   }
 
   .manual-verify-btn:hover { opacity: .9; transform: translateY(-1px); }
 
-  .ig-verify-result {
+  .ig-verify-result {  .ig-verify-result {
     border-radius: 10px;
     font-size: 11px;
     line-height: 1.5;
@@ -2972,25 +3050,57 @@
           </div>
 
           <!-- ── MANUAL TOKEN FALLBACK (collapsed) ── -->
+          <!-- Manual fallback — closed by default, clearly labeled when open -->
           <details class="manual-token-details">
-            <summary data-de="🔧 Manuell einrichten (für Entwickler)" data-en="🔧 Manual setup (for developers)">🔧 Manuell einrichten (für Entwickler)</summary>
+            <summary>
+              <span class="manual-summary-icon">🔧</span>
+              <span>
+                <span class="manual-summary-title" data-de="Manuell mit Token einrichten" data-en="Manual token setup">Manuell mit Token einrichten</span>
+                <span class="manual-summary-sub" data-de="Nur wenn der Login-Button oben nicht klappt" data-en="Only if the login button above doesn't work">Nur wenn der Login-Button oben nicht klappt</span>
+              </span>
+              <span class="manual-summary-arrow">›</span>
+            </summary>
             <div class="manual-token-body">
-              <p class="manual-token-intro" data-de="Nur nötig wenn der Login-Button nicht funktioniert. Du brauchst einen Access Token aus dem Meta Graph API Explorer." data-en="Only needed if the login button doesn't work. You need an access token from the Meta Graph API Explorer.">Nur nötig wenn der Login-Button nicht funktioniert. Du brauchst einen Access Token aus dem Meta Graph API Explorer.</p>
 
-              <div class="manual-token-fields">
-                <div class="manual-token-field">
-                  <label data-de="Instagram Access Token" data-en="Instagram Access Token">Instagram Access Token</label>
-                  <div class="manual-token-input-row">
-                    <input type="password" id="ig_tok" placeholder="EAABsb..." autocomplete="off">
-                    <button type="button" class="manual-eye-btn" onclick="toggleIgTokenVisibility()" title="Anzeigen">👁</button>
-                  </div>
-                  <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener" class="manual-token-link" data-de="Token holen (Graph API Explorer) ↗" data-en="Get token (Graph API Explorer) ↗">Token holen (Graph API Explorer) ↗</a>
+              <div class="manual-step-hint">
+                <span class="manual-step-badge">Schritt 1</span>
+                <span data-de="Geh auf " data-en="Go to ">Geh auf </span>
+                <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener">developers.facebook.com/tools/explorer</a>
+                <span data-de=" → wähle deine Meta-App → klicke auf „Generate Access Token" → füge diese Berechtigungen hinzu:" data-en=" → select your Meta app → click "Generate Access Token" → add these permissions:"> → wähle deine Meta-App → klicke auf „Generate Access Token" → füge diese Berechtigungen hinzu:</span>
+                <div class="manual-perms">
+                  <code>instagram_basic</code>
+                  <code>instagram_content_publish</code>
+                  <code>pages_show_list</code>
+                  <code>pages_read_engagement</code>
                 </div>
-                <div class="manual-token-field">
-                  <label>Instagram Account ID</label>
-                  <input type="text" id="ig_acc" placeholder="17841404450011038">
-                  <small class="manual-token-hint" data-de='Graph API Explorer → me/accounts?fields=instagram_business_account → "id" kopieren' data-en='Graph API Explorer → me/accounts?fields=instagram_business_account → copy "id"'>Graph API Explorer → me/accounts?fields=instagram_business_account → "id" kopieren</small>
+              </div>
+
+              <div class="manual-field-block">
+                <div class="manual-field-label">
+                  <span data-de="Access Token" data-en="Access Token">Access Token</span>
+                  <span class="manual-field-note" data-de="langer Code aus dem Graph API Explorer" data-en="long code from Graph API Explorer">langer Code aus dem Graph API Explorer</span>
                 </div>
+                <div class="manual-token-input-row">
+                  <input type="password" id="ig_tok" placeholder="EAABsb..." autocomplete="off" class="manual-big-input">
+                  <button type="button" class="manual-eye-btn" onclick="toggleIgTokenVisibility()" title="Anzeigen / verstecken">👁</button>
+                </div>
+              </div>
+
+              <div class="manual-step-hint" style="margin-top:12px;">
+                <span class="manual-step-badge">Schritt 2</span>
+                <span data-de='Im Graph API Explorer: Abfrage ' data-en='In Graph API Explorer: run query '>Im Graph API Explorer: Abfrage </span>
+                <code class="manual-inline-code" onclick="copyInlineCode(this)" title="Klicken zum Kopieren">me/accounts?fields=instagram_business_account</code>
+                <span data-de=" ausführen → die Zahl unter " data-en=" → copy the number under "> ausführen → die Zahl unter </span>
+                <code class="manual-inline-code">id</code>
+                <span data-de=" kopieren." data-en=" copy."> kopieren.</span>
+              </div>
+
+              <div class="manual-field-block">
+                <div class="manual-field-label">
+                  <span>Instagram Account ID</span>
+                  <span class="manual-field-note" data-de="die lange Zahl — nicht die Facebook-Seiten-ID" data-en="the long number — not the Facebook Page ID">die lange Zahl — nicht die Facebook-Seiten-ID</span>
+                </div>
+                <input type="text" id="ig_acc" placeholder="17841404450011038" class="manual-big-input">
               </div>
 
               <button type="button" class="manual-verify-btn" onclick="verifyInstagramConnection()" id="ig-verify-btn">
@@ -4838,6 +4948,15 @@ function igWizStep(step) {
     if (i === step) btn.classList.add('active');
     else if (i < step) btn.classList.add('done');
   }
+}
+
+function copyInlineCode(el) {
+  const text = el.textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = el.textContent;
+    el.textContent = '✓ kopiert';
+    setTimeout(() => { el.textContent = orig; }, 1800);
+  });
 }
 
 function copyCode(el) {
