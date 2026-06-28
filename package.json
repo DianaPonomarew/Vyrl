@@ -1,13 +1,13 @@
 {
   "name": "vyrl",
   "version": "1.0.0",
-  "description": "AI-powered social content automation — turn one idea into daily Reels, automatically.",
+  "description": "AI-powered social content automation",
   "private": true,
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "@netlify/blobs": "^8.1.0"
+    "@netlify/blobs": "^10.7.9"
   },
   "scripts": {
     "dev": "netlify dev"
